@@ -1,0 +1,23 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" tools:ignore="ResourceName" />
+
+    //普通textview
+    <style name="TextView_commom" tools:ignore="ResourceName">
+        <item name="android:layout_height">@dimen/dp_26</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="sDividerLineType">none</item>
+        <item name="sLeftViewWidth">0dp</item>
+        <item name="sLeftTextColor">@color/gray</item>
+        <item name="sLeftTextSize">12sp</item>
+        <item name="sCenterTextSize">12sp</item>
+        <item name="android:duplicateParentState">false</item>
+        <item name="sLeftViewGravity">left_center</item>
+        <item name="sCenterViewGravity">left_center</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="sUseRipple">false </item>
+    </style>
+
+
+</resources>

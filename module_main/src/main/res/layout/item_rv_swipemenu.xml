@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:stv="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <com.guanaj.easyswipemenulibrary.EasySwipeMenuLayout
+        android:id="@+id/es"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:layout_marginLeft="@dimen/dp_8"
+        android:layout_marginRight="@dimen/dp_8"
+        android:layout_marginBottom="@dimen/dp_8"
+        app:contentView="@+id/content"
+        app:rightMenuView="@+id/right">
+        <!--app:leftMenuView="@+id/left"-->
+
+        <!--<LinearLayout-->
+        <!--android:id="@+id/left"-->
+        <!--android:layout_width="100dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@android:color/holo_blue_dark"-->
+
+        <!--android:orientation="horizontal"-->
+        <!--android:padding="20dp">-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+
+        <!--android:layout_height="wrap_content"-->
+        <!--android:clickable="true"-->
+        <!--android:text="分享" />-->
+
+        <!--</LinearLayout>-->
+
+        <RelativeLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_8"
+            android:layout_marginTop="@dimen/dp_2"
+            android:layout_marginRight="@dimen/dp_2"
+            android:layout_marginBottom="@dimen/dp_6"
+            android:background="@drawable/shape_linearlayout"
+            android:elevation="@dimen/dp_3"
+            android:orientation="horizontal"
+            tools:targetApi="lollipop">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.allen.library.SuperTextView
+                    android:id="@+id/tv_id"
+
+                    style="@style/TextView_commom"
+                    stv:sCenterTextString=""
+                    stv:sLeftTextString="RFID编号：" />
+
+                <!--<com.allen.library.SuperTextView-->
+                    <!--style="@style/TextView_commom"-->
+                    <!--stv:sCenterTextString="U盘"-->
+                    <!--stv:sLeftTextString="物品名称：" />-->
+
+                <com.allen.library.SuperTextView
+                    android:id="@+id/stv_belongDept"
+                    style="@style/TextView_commom"
+                    stv:sCenterTextString=""
+                    stv:sLeftTextString="所属部门：" />
+
+                <com.allen.library.SuperTextView
+                    android:id="@+id/stv_assetUser"
+                    style="@style/TextView_commom"
+                    stv:sCenterTextString=""
+                    stv:sLeftTextString="当前责任人：" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/ll_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!--<me.jessyan.armscomponent.commonres.widget.LoadingView-->
+                    <!--android:id="@+id/lv_loadview"-->
+                    <!--android:layout_width="@dimen/dp_70"-->
+                    <!--android:layout_height="@dimen/dp_70"-->
+                    <!--/>-->
+
+                <com.wang.avi.AVLoadingIndicatorView
+                    android:id="@+id/avi"
+                    style="@style/AVLoadingIndicatorView"
+                    android:layout_width="@dimen/dp_20"
+                    android:layout_height="@dimen/dp_20"
+                    android:visibility="visible"
+                    app:indicatorColor="@color/black"
+                    app:indicatorName="BallSpinFadeLoaderIndicator" />
+
+                <ImageView
+                    android:id="@+id/img_state"
+                    android:layout_margin="@dimen/dp_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_state"
+                    android:clickable="false"
+                    android:enabled="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/dp_10"
+                    android:layout_marginRight="@dimen/dp_10"
+                    android:textSize="@dimen/sp_14" />
+
+                <!--<TextView-->
+                    <!--android:id="@+id/tv_time"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="@dimen/dp_10"-->
+                    <!--android:layout_marginRight="@dimen/dp_10"-->
+                    <!--android:textSize="@dimen/sp_14" />-->
+
+                <!--<cn.iwgang.countdownview.CountdownView-->
+                    <!--android:id="@+id/cv_time"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--app:isHideTimeBackground="true"-->
+                    <!--app:isShowDay="true"-->
+                    <!--app:isShowHour="true"-->
+                    <!--app:isShowMinute="true"-->
+                    <!--app:isShowSecond="true"-->
+                    <!--app:isShowMillisecond="true"-->
+                    <!--app:timeTextColor="#000000"-->
+                    <!--app:timeTextSize="22sp"-->
+                    <!--app:isTimeTextBold="true"-->
+                    <!--app:suffixGravity="bottom"-->
+                    <!--app:suffixTextColor="#000000"-->
+                    <!--app:suffixTextSize="12sp"-->
+                    <!--app:suffixHour="时"-->
+                    <!--app:suffixMinute="分"-->
+                    <!--app:suffixSecond="秒"-->
+                    <!--app:suffixMillisecond="毫秒" />-->
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/right"
+            android:layout_width="@dimen/dp_90"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/dp_2"
+            android:layout_marginBottom="@dimen/dp_6"
+            android:background="@drawable/shape_linearlayout_right"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/right_menu_1"
+                android:layout_width="@dimen/dp_33"
+                android:layout_height="@dimen/dp_33"
+                android:background="@mipmap/ic_del"
+                android:gravity="center"
+                android:padding="20dp" />
+
+
+        </LinearLayout>
+    </com.guanaj.easyswipemenulibrary.EasySwipeMenuLayout>
+</LinearLayout>

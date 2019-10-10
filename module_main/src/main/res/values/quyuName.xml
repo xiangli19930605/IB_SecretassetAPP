@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="quyuName">
+        <item>用户区</item>
+        <item>安全区</item>
+        <item>标签信息区</item>
+        <item>编码区</item>
+    </string-array>
+</resources>

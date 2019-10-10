@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <RelativeLayout
+        android:id="@+id/normal_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ll_head"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_228"
+            android:background="@mipmap/bg_home"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:layout_marginTop="46dp"
+                android:layout_marginRight="@dimen/dp_20">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BAIST"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="2019-2-16"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="35dp"
+                android:text="欢迎进入涉密资产查验手持机"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="224dp"
+                android:layout_height="1dp"
+                android:layout_margin="@dimen/dp_12"
+                android:background="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome to the management system"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_head"
+            android:layout_marginTop="-40dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shadow_home_bg2">
+
+                    <Button
+                        android:id="@+id/btn_scan"
+                        android:layout_width="130dp"
+                        android:layout_height="140dp"
+                        android:background="@mipmap/bg_scan"
+                        android:gravity="top|center"
+                        android:padding="@dimen/dp_10"
+                        android:text="扫描RFID盘查" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shadow_home_bg2">
+
+                    <Button
+                        android:id="@+id/btn_current"
+                        android:layout_width="130dp"
+                        android:layout_height="140dp"
+                        android:background="@mipmap/bg_current"
+                        android:gravity="top|center"
+                        android:padding="@dimen/dp_10"
+                        android:text="当前盘查事件" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shadow_home_bg2">
+
+                    <Button
+                        android:id="@+id/btn_search"
+                        android:layout_width="130dp"
+                        android:layout_height="140dp"
+                        android:background="@mipmap/bg_search"
+                        android:gravity="top|center"
+                        android:padding="@dimen/dp_10"
+                        android:text="资产编号搜索" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shadow_home_bg2">
+                    <Button
+                        android:id="@+id/btn_history"
+                        android:layout_width="130dp"
+                        android:layout_height="140dp"
+                        android:background="@mipmap/bg_history"
+                        android:gravity="top|center"
+                        android:padding="@dimen/dp_10"
+                        android:text="历史盘查记录"
+                        tools:targetApi="lollipop" />
+
+
+            </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</FrameLayout>

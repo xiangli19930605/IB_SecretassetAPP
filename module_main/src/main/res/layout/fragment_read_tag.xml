@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#CCCCCC"
+        android:divider="@drawable/divider"
+        android:dividerPadding="1.25dp"
+        android:orientation="vertical"
+        android:showDividers="end" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp" >
+
+            <TextView
+                android:id="@+id/quyu_read_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#CCCCCC"
+                android:text="操作区域"
+                android:textSize="50px" />
+
+            <Spinner
+                android:id="@+id/quyu_read_data_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/quyuName"
+                android:background="#FFFFFF"
+                android:textSize="50px" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp" >
+
+            <TextView
+                android:id="@+id/zhizhenchangdu_read_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#CCCCCC"
+                android:text="起始位置"
+                android:textSize="50px" />
+
+            <EditText
+                android:id="@+id/zhizhenchangdu_read_data_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="0"
+                android:background="#FFFFFF"
+                android:textSize="50px" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp" >
+
+            <TextView
+                android:id="@+id/zicahgndu_read_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#CCCCCC"
+                android:text="读取长度"
+                android:textSize="50px" />
+
+            <EditText
+                android:id="@+id/zicahgndu_read_data_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="4"
+                android:background="#FFFFFF"
+                android:textSize="50px" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp" >
+
+            <TextView
+                android:id="@+id/read_dataOder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#CCCCCC"
+                android:text="操作密码"
+                android:textSize="50px" />
+
+            <EditText
+                android:id="@+id/read_dataOder_input1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:inputType="number"
+                android:text="0000"
+                android:maxLines="1"
+                android:textSize="50px" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="25dp"  >
+
+            <Button
+                android:id="@+id/sendmessage_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="发送指令" />
+
+            <Button
+                android:id="@+id/read_data_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="读取" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:background="#CCCCCC"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView_read_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            />
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

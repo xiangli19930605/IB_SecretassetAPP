@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:stv="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/shape_linearlayout"
+                android:orientation="vertical">
+
+                <com.allen.library.SuperTextView
+                    style="@style/TextView_commom"
+                    stv:sCenterTextString="12312"
+                    stv:sLeftTextString="RFID编号：" />
+
+                <com.allen.library.SuperTextView
+                    style="@style/TextView_commom"
+                    stv:sCenterTextString="2019-3-4"
+                    stv:sLeftTextString="盘查时间：" />
+
+                <com.allen.library.SuperTextView
+                    style="@style/TextView_commom"
+                    stv:sCenterTextString="4"
+                    stv:sLeftTextString="物品件数：" />
+
+                <com.allen.library.SuperTextView
+                    style="@style/TextView_commom"
+                    android:id="@+id/tv_result"
+                    stv:sCenterTextString="允许通行"
+                    stv:sLeftTextString="盘查结果：" />
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

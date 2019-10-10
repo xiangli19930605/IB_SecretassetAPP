@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:stv="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+    <!--<me.jessyan.armscomponent.commonsdk.widget.ActionBar-->
+    <!--android:id="@+id/actionbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:background="@color/blue" />-->
+    <!--<android.support.v7.widget.Toolbar-->
+    <!--android:id="@+id/toolbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="?actionBarSize"-->
+    <!--android:background="@color/red" />-->
+
+    <!--待添加区域-->
+    <RelativeLayout
+        android:id="@+id/actionbar"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ll_person"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="20dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_person_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="我的设置"
+                android:textColor="@color/light_white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg"
+        android:orientation="vertical">
+
+
+        <com.allen.library.SuperTextView
+            android:id="@+id/sv_ip_set"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="50dp"
+            stv:sDividerLineType="both"
+            stv:sLeftTextString="服务器IP设置"
+            stv:sRightIconRes="@mipmap/arrow_right_red" />
+
+        <com.allen.library.SuperTextView
+            android:id="@+id/btn_offline"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            stv:sDividerLineType="both"
+            stv:sLeftTextString="测试获取离线数据"
+            stv:sRightIconRes="@mipmap/arrow_right_red" />
+
+    </LinearLayout>
+
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/cb_setting_night"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/abc_btn_check_material"
+        android:buttonTint="@color/colorAccent"
+        tools:ignore="PrivateResource" />
+
+
+    <Button
+        android:id="@+id/btn_web"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WEBSOCKET" />
+
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEST" />
+
+
+    <android.support.v7.widget.CardView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>

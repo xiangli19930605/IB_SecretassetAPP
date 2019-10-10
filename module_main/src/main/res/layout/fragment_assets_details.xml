@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:stv="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:background="@drawable/shape_linearlayout"
+        android:orientation="vertical"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.allen.library.SuperTextView
+            style="@style/TextView_commom"
+            android:id="@+id/stv_rfidId"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="RFID编号："
+            />
+        <!--<com.allen.library.SuperTextView-->
+            <!--style="@style/TextView_commom"-->
+            <!--stv:sCenterTextString="U盘"-->
+            <!--stv:sLeftTextString="物品名称："-->
+            <!--/>-->
+        <com.allen.library.SuperTextView
+            style="@style/TextView_commom"
+            android:id="@+id/stv_belongDept"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="所属部门："
+            />
+        <com.allen.library.SuperTextView
+            android:id="@+id/stv_assetUser"
+            style="@style/TextView_commom"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="当前负责人："
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:background="@drawable/shape_linearlayout"
+        android:orientation="vertical"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.allen.library.SuperTextView
+            style="@style/TextView_commom"
+            android:id="@+id/stv_assetModel"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="类别："
+            />
+        <!--<com.allen.library.SuperTextView-->
+            <!--style="@style/TextView_commom"-->
+            <!--stv:sCenterTextString="U盘"-->
+            <!--stv:sLeftTextString="品牌："-->
+            <!--/>-->
+        <com.allen.library.SuperTextView
+            style="@style/TextView_commom"
+            android:id="@+id/stv_assetState"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="资产状态："
+            />
+        <com.allen.library.SuperTextView
+            android:id="@+id/stv_permissionState"
+            style="@style/TextView_commom"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="授权状态："
+            />
+        <com.allen.library.SuperTextView
+            android:id="@+id/suc_"
+            style="@style/TextView_commom"
+            stv:sCenterTextString=""
+            stv:sLeftTextString="授权信息："
+            />
+
+    </LinearLayout>
+
+
+
+
+
+
+</LinearLayout>
