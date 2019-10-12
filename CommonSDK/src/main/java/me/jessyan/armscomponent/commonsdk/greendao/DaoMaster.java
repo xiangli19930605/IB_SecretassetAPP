@@ -23,16 +23,16 @@ public class DaoMaster extends AbstractDaoMaster {
     public static void createAllTables(Database db, boolean ifNotExists) {
         AssetsBeanDao.createTable(db, ifNotExists);
         HistoryDataDao.createTable(db, ifNotExists);
-        TaskBeanDao.createTable(db, ifNotExists);
         OffLineAssetsBeanDao.createTable(db, ifNotExists);
+        TaskBeanDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
         AssetsBeanDao.dropTable(db, ifExists);
         HistoryDataDao.dropTable(db, ifExists);
-        TaskBeanDao.dropTable(db, ifExists);
         OffLineAssetsBeanDao.dropTable(db, ifExists);
+        TaskBeanDao.dropTable(db, ifExists);
     }
 
     /**
@@ -53,8 +53,8 @@ public class DaoMaster extends AbstractDaoMaster {
         super(db, SCHEMA_VERSION);
         registerDaoClass(AssetsBeanDao.class);
         registerDaoClass(HistoryDataDao.class);
-        registerDaoClass(TaskBeanDao.class);
         registerDaoClass(OffLineAssetsBeanDao.class);
+        registerDaoClass(TaskBeanDao.class);
     }
 
     public DaoSession newSession() {

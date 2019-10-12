@@ -3,7 +3,10 @@ package com.idealbank.module_main.mvp.model;
 import android.app.Application;
 
 import com.google.gson.Gson;
+import com.idealbank.module_main.bean.UpAssetsBean;
+import com.idealbank.module_main.bean.UpLoadAssetsBean;
 import com.idealbank.module_main.mvp.model.api.Api;
+import com.idealbank.module_main.mvp.model.entity.UpLoad;
 import com.jess.arms.integration.IRepositoryManager;
 import com.jess.arms.mvp.BaseModel;
 
@@ -13,7 +16,10 @@ import javax.inject.Inject;
 
 import com.idealbank.module_main.mvp.contract.NewInventoryContract;
 
+import java.util.ArrayList;
+
 import io.reactivex.Observable;
+import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 
 
@@ -48,13 +54,13 @@ public class NewInventoryModel extends BaseModel implements NewInventoryContract
         this.mApplication = null;
     }
     @Override
-    public Observable<AssetsBean> getRfid(){
+    public Observable<BaseResponseBean<ArrayList<AssetsBean>>> getListByRfid(UpAssetsBean task) {
         return mRepositoryManager.obtainRetrofitService(Api.class)
-                .getRfid("","");
+                .getListByRfid( task);
     }
-
     @Override
-    public Observable<AssetsBean> upLoad() {
-        return null;
+    public Observable<BaseResponseBean> saveCheckTask(UpLoadAssetsBean upLoadAssetsBean) {
+        return mRepositoryManager.obtainRetrofitService(Api.class)
+                .saveCheckTask(upLoadAssetsBean  );
     }
 }

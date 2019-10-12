@@ -24,7 +24,7 @@ public class PreferenceHelperImpl implements PreferenceHelper {
 
     private Gson gson;
 
-    private  SharedPreferences mPreferences;
+    private SharedPreferences mPreferences;
 
     @Inject
     public PreferenceHelperImpl() {
@@ -34,12 +34,22 @@ public class PreferenceHelperImpl implements PreferenceHelper {
 
     @Override
     public boolean getNightModeState() {
-        return mPreferences.getBoolean(Constants.NIGHT_MODE_STATE,false);
+        return mPreferences.getBoolean(Constants.NIGHT_MODE_STATE, false);
     }
 
     @Override
     public void setNightModeState(boolean b) {
         mPreferences.edit().putBoolean(Constants.NIGHT_MODE_STATE, b).apply();
+    }
+
+    @Override
+    public void setLocation(String location) {
+        mPreferences.edit().putString(Constants.LOCATION, location).apply();
+    }
+
+    @Override
+    public String getLocation() {
+        return mPreferences.getString(Constants.LOCATION, "");
     }
 
     @Override
@@ -49,6 +59,6 @@ public class PreferenceHelperImpl implements PreferenceHelper {
 
     @Override
     public boolean getUsbState() {
-        return mPreferences.getBoolean(Constants.USB_STATE,false);
+        return mPreferences.getBoolean(Constants.USB_STATE, false);
     }
 }

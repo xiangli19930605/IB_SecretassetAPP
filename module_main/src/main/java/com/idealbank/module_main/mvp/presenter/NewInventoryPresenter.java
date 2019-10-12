@@ -2,6 +2,9 @@ package com.idealbank.module_main.mvp.presenter;
 
 import android.app.Application;
 
+import com.idealbank.module_main.bean.UpAssetsBean;
+import com.idealbank.module_main.bean.UpLoadAssetsBean;
+import com.idealbank.module_main.mvp.model.entity.UpLoad;
 import com.jess.arms.integration.AppManager;
 import com.jess.arms.di.scope.FragmentScope;
 import com.jess.arms.mvp.BasePresenter;
@@ -9,7 +12,10 @@ import com.jess.arms.http.imageloader.ImageLoader;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
+import me.jessyan.armscomponent.commonsdk.constants.Constants;
+import me.jessyan.retrofiturlmanager.RetrofitUrlManager;
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
 import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber;
 import me.jessyan.rxerrorhandler.handler.RetryWithDelay;
@@ -18,6 +24,8 @@ import javax.inject.Inject;
 
 import com.idealbank.module_main.mvp.contract.NewInventoryContract;
 import com.jess.arms.utils.RxLifecycleUtils;
+
+import java.util.ArrayList;
 
 
 /**
@@ -58,10 +66,11 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
     }
 
 
-    public void getRfid() {
-        mModel.getRfid()
+    public void getListByRfid(UpAssetsBean task) {
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        mModel.getListByRfid(task)
                 .subscribeOn(Schedulers.io())
-                .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
+                .retryWhen(new RetryWithDelay(1, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
                 .doOnSubscribe(disposable -> {
                     mRootView.showLoading();//显示下拉刷新的进度条
                 }).subscribeOn(AndroidSchedulers.mainThread())
@@ -70,16 +79,16 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
                     mRootView.hideLoading();//隐藏下拉刷新的进度条
                 })
                 .compose(RxLifecycleUtils.bindToLifecycle(mRootView))//使用 Rxlifecycle,使 Disposable 和 Activity 一起销毁
-                .subscribe(new ErrorHandleSubscriber<AssetsBean>(mErrorHandler) {
+                .subscribe(new ErrorHandleSubscriber<BaseResponseBean<ArrayList<AssetsBean>>>(mErrorHandler) {
                     @Override
-                    public void onNext(AssetsBean assetsBean) {
-                        mRootView.receiveResult();
-
+                    public void onNext(BaseResponseBean<ArrayList<AssetsBean>> assetsBean) {
+                        mRootView.receiveResult(assetsBean.getData());
                     }
                 });
     }
-    public void upLoad() {
-        mModel.getRfid()
+
+    public void saveCheckTask(UpLoadAssetsBean upLoadAssetsBean) {
+        mModel.saveCheckTask(upLoadAssetsBean)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
                 .doOnSubscribe(disposable -> {
@@ -90,10 +99,10 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
                     mRootView.hideLoading();//隐藏下拉刷新的进度条
                 })
                 .compose(RxLifecycleUtils.bindToLifecycle(mRootView))//使用 Rxlifecycle,使 Disposable 和 Activity 一起销毁
-                .subscribe(new ErrorHandleSubscriber<AssetsBean>(mErrorHandler) {
+                .subscribe(new ErrorHandleSubscriber<BaseResponseBean>(mErrorHandler) {
                     @Override
-                    public void onNext(AssetsBean assetsBean) {
-                        mRootView.receiveResult();
+                    public void onNext(BaseResponseBean assetsBean) {
+
 
                     }
                 });

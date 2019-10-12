@@ -165,6 +165,16 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void setLocation(String location) {
+        mPreferencesHelper .setLocation(location);
+    }
+
+    @Override
+    public String getLocation() {
+        return mPreferencesHelper .getLocation();
+    }
+
+    @Override
     public void setUsbState(boolean b) {
           mPreferencesHelper.setUsbState(b);
     }

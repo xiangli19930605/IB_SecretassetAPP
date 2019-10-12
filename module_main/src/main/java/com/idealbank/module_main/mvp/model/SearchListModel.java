@@ -22,6 +22,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
+import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.HistoryData;
 
 
@@ -62,7 +63,7 @@ public class SearchListModel extends BaseModel implements SearchListContract.Mod
     }
 
     @Override
-    public Observable<BaseResponseBean<UpLoad>> getListByRfid(UpAssetsBean task) {
+    public Observable<BaseResponseBean<ArrayList<AssetsBean>>> getListByRfid(UpAssetsBean task) {
         return mRepositoryManager.obtainRetrofitService(Api.class)
                 .getListByRfid( task);
     }

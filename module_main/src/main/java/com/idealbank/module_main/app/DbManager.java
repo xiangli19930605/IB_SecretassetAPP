@@ -163,6 +163,18 @@ public class DbManager implements DbHelper , PreferenceHelper {
     }
 
     @Override
+    public void setLocation(String location) {
+        MyApplication.mComponent
+                .getAppDataManager().setLocation(location);
+    }
+
+    @Override
+    public String getLocation() {
+        return   MyApplication.mComponent
+                .getAppDataManager().getLocation();
+    }
+
+    @Override
     public void setUsbState(boolean b) {
           MyApplication.mComponent
                 .getAppDataManager().setUsbState(b);

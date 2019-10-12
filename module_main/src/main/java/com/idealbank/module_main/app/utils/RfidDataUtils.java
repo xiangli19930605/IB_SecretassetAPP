@@ -10,6 +10,7 @@ import me.jessyan.armscomponent.commonres.dialog.AppDialog;
 import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
+import me.jessyan.armscomponent.commonsdk.utils.CommonUtils;
 import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
 
 public class RfidDataUtils {
@@ -17,8 +18,9 @@ public class RfidDataUtils {
 
     //处理离线
     public static Boolean changeOffline(Context content, List<AssetsBean> list, String taskid) {
-        //先判断是否选择过离线模式
-        if (!UsbUtils.getUsbType() && !new DbManager().getUsbState()) {
+        //先判断是否选择过离线模式   (两种情况  1 socket 2 )
+//        if (!UsbUtils.getUsbType() && !new DbManager().getUsbState()) {
+        if (!CommonUtils.isNetworkConnected()) {
             new AppDialog(content)
                     .setTitle("提示")
                     .setContent("链接断开，将进行离线模式")
@@ -62,4 +64,8 @@ public class RfidDataUtils {
         }
         return false;
     }
+
+
+
+
 }

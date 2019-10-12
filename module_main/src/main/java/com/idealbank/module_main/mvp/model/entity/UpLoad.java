@@ -18,6 +18,7 @@ public class UpLoad {
      * assetList : [{"id":"SW-0002","rfidId":"TREQ","assetState":"1","assetUser":"22","belongDept":"017","permissionState":"1","lastApproveUser":"017"}]
      */
 
+    private String taskId;
     private String id;
     private String createTime;
     private String deviceId;

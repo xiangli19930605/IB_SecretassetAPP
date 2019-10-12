@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
-
+//查询的资产
 @Getter
 @Setter
 public class UpAssetsBean {

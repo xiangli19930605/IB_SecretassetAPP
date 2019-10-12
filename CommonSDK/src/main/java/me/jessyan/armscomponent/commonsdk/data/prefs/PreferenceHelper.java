@@ -1,7 +1,6 @@
 package me.jessyan.armscomponent.commonsdk.data.prefs;
 
 
-
 /**
  * @author flymegoc
  * @date 2018/3/4
@@ -22,7 +21,12 @@ public interface PreferenceHelper {
      * @param b current night mode state
      */
     void setNightModeState(boolean b);
-//获取USB状态
+
+    void setLocation(String location);
+
+    String getLocation();
+
+    //获取USB状态
     void setUsbState(boolean b);
 
     boolean getUsbState();

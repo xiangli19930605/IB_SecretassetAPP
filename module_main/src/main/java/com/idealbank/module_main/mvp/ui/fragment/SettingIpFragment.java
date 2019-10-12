@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseActionBarFragment;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
+import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
 
@@ -49,6 +50,8 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
 
     @BindView(R2.id.edt_ip)
     EditText mEdtIP;
+    @BindView(R2.id.edt_port)
+    EditText mEdtPort;
 
     public static SettingIpFragment newInstance() {
         SettingIpFragment fragment = new SettingIpFragment();
@@ -74,7 +77,8 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
     public void initData(@Nullable Bundle savedInstanceState) {
 
         setTitleText("服务器IP设置");
-        mEdtIP.setHint( Constants.IP);
+        mEdtIP.setText( Constants.IP);
+        mEdtPort.setText( Constants.PORT);
 
 
     }
@@ -84,6 +88,9 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
         int id = view.getId();
         if (id == R.id.btn_edit) {
             Constants.IP=mEdtIP.getText().toString();
+            Constants.PORT=mEdtPort.getText().toString();
+
+            ToastUtil.showToast(ToastUtil.TPYE_SUCCESS,"修改成功");
         }
     }
 

@@ -13,6 +13,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
+import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.HistoryData;
 
 
@@ -53,12 +54,14 @@ public interface SearchListContract {
          */
         void clearHistoryData();
 
+
+        void receiveResult(ArrayList<AssetsBean> list);
     }
 
     //Model层定义接口,外部只需关心Model返回的数据,无需关心内部细节,即是否使用缓存
     interface Model extends IModel {
         List<HistoryData> loadAllHistoryData();
 
-        Observable<BaseResponseBean<UpLoad>> getListByRfid(UpAssetsBean task);
+        Observable<BaseResponseBean<ArrayList<AssetsBean>>> getListByRfid(UpAssetsBean task);
     }
 }

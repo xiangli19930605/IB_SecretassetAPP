@@ -20,6 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
+import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.HistoryData;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import me.jessyan.armscomponent.commonsdk.utils.RxUtil;
@@ -65,6 +66,7 @@ public class SearchListPresenter extends BasePresenter<SearchListContract.Model,
     SearchListAdapter mAdapter;
     @Inject
     List<HistoryData> mList;
+
     @Inject
     public SearchListPresenter(SearchListContract.Model model, SearchListContract.View rootView) {
         super(model, rootView);
@@ -79,8 +81,9 @@ public class SearchListPresenter extends BasePresenter<SearchListContract.Model,
         this.mImageLoader = null;
         this.mApplication = null;
     }
+
     public void loadAllHistoryData() {
-        mList= mModel.loadAllHistoryData();
+        mList = mModel.loadAllHistoryData();
         Collections.reverse(mList);
         mAdapter.replaceData(mList);
 //        Observable.create((ObservableOnSubscribe<List<HistoryData>>) e -> {
@@ -109,7 +112,7 @@ public class SearchListPresenter extends BasePresenter<SearchListContract.Model,
 
 
     public void getListByRfid(UpAssetsBean task) {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://"+ Constants.IP+":"+Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
         mModel.getListByRfid(task)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
@@ -121,16 +124,13 @@ public class SearchListPresenter extends BasePresenter<SearchListContract.Model,
                     mRootView.hideLoading();//隐藏下拉刷新的进度条
                 })
                 .compose(RxLifecycleUtils.bindToLifecycle(mRootView))//使用 Rxlifecycle,使 Disposable 和 Activity 一起销毁
-                .subscribe(new ErrorHandleSubscriber<BaseResponseBean<UpLoad>>(mErrorHandler) {
+                .subscribe(new ErrorHandleSubscriber<BaseResponseBean<ArrayList<AssetsBean>>>(mErrorHandler) {
                     @Override
-                    public void onNext(BaseResponseBean<UpLoad> assetsBean) {
-
-
+                    public void onNext(BaseResponseBean<ArrayList<AssetsBean>> assetsBean) {
+                        mRootView.receiveResult(assetsBean.getData());
                     }
                 });
     }
-
-
 
 
 }

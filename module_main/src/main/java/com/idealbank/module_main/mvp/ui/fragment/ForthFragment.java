@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.idealbank.module_main.R2;
 import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.app.utils.Intents;
+import com.idealbank.module_main.bean.Location;
+import com.idealbank.module_main.bean.OfflineBeanRequest;
 import com.idealbank.module_main.mvp.ui.activity.MainActivity;
 import com.idealbank.module_main.mvp.ui.activity.TcpLinkActivity;
 import com.jess.arms.di.component.AppComponent;
@@ -27,7 +29,6 @@ import com.idealbank.module_main.mvp.contract.ForthContract;
 import com.idealbank.module_main.mvp.presenter.ForthPresenter;
 
 import com.idealbank.module_main.R;
-import com.jess.arms.utils.LogUtils;
 
 import org.simple.eventbus.Subscriber;
 
@@ -40,19 +41,22 @@ import me.jessyan.armscomponent.commonres.dialog.LoadingDialog;
 import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
 import me.jessyan.armscomponent.commonsdk.bean.Event;
+import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
 import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
 import me.jessyan.armscomponent.commonsdk.core.RouterHub;
+import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
 import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
 import me.jessyan.armscomponent.commonsdk.utils.Utils;
+import me.jessyan.autosize.utils.LogUtils;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
 
 
 /**
  * ================================================
- * Description:
- * <p>
+ * Description:设置界面
+ * * <p>
  * Created by MVPArmsTemplate on 02/19/2019 09:45
  * <a href="mailto:jess.yan.effort@gmail.com">Contact me</a>
  * <a href="https://github.com/JessYanCoding">Follow me</a>
@@ -121,15 +125,15 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
     }
 
 
-    @OnClick({R2.id.btn_web, R2.id.btn_test, R2.id.btn_offline, R2.id.sv_ip_set})
+    @OnClick({R2.id.btn_web, R2.id.btn_offline, R2.id.sv_ip_set, R2.id.btn_location})
     void onClick(View view) {
         int i = view.getId();
         if (i == R.id.btn_web) {
             Intents.getIntents().Intent(getActivity(), TcpLinkActivity.class);
-        } else if (i == R.id.btn_test) {
-            mPresenter.getLocationList();
         } else if (i == R.id.sv_ip_set) {
             ((MainFragment) getParentFragment()).startBrotherFragment(SettingIpFragment.newInstance());
+        } else if (i == R.id.btn_location) {
+            ((MainFragment) getParentFragment()).startBrotherFragment(LocationFragment.newInstance());
         } else if (i == R.id.btn_offline) {
 //            new DbManager().clearOffLineAssetsBean();
 //            ArrayList<OffLineAssetsBean> list=new ArrayList();
@@ -144,6 +148,18 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
 //            for (int j = 0; j <list2.size() ; j++) {
 //                LogUtils.warnInfo(list2.get(j).getRfidId());
 //            }
+
+            Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
+
+            if (location != null) {
+                OfflineBeanRequest offlineBeanRequest=new OfflineBeanRequest();
+                offlineBeanRequest.setDeviceId(location.getId());
+                offlineBeanRequest.setRfidId("");
+
+                mPresenter.getOffLinePermissionList(offlineBeanRequest);
+            }else{
+                ((MainFragment) getParentFragment()).startBrotherFragment(LocationFragment.newInstance());
+            }
 
             if (loadingDialog != null && !loadingDialog.isShowing()) {
                 loadingDialog.setTitleText("请求离线数据").show();
@@ -171,5 +187,12 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
         }
+    }
+
+    @Override
+    public void getOffLinePermissionList(ArrayList<OffLineAssetsBean> list) {
+        dismissLoading();
+        new DbManager().clearOffLineAssetsBean();
+        new DbManager().insertInTxOffLineAssetsBean(list);
     }
 }

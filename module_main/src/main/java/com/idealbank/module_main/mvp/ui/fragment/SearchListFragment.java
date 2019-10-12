@@ -23,6 +23,8 @@ import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
 import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
 
+import com.idealbank.module_main.app.DbManager;
+import com.idealbank.module_main.bean.Location;
 import com.idealbank.module_main.bean.UpAssetsBean;
 import com.idealbank.module_main.mvp.model.entity.UpLoad;
 import com.idealbank.module_main.mvp.ui.adapter.SearchListAdapter;
@@ -115,37 +117,7 @@ public class SearchListFragment extends BaseToolBarFragment<SearchListPresenter>
     void onClick(View view) {
         int i = view.getId();
         if (i == R.id.search_tv) {
-            List<AssetsBean> addData = new ArrayList<>();
-            AssetsBean assetsBean = new AssetsBean(null, null, search_edit.getText().toString(), "", 4, "", "", "", "", "", "", DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL), "", "", "", "", 4, 0);
-            addData.add(assetsBean);
-
-//            Message message = new Message();
-//            message.setId(1);
-//            message.setType(MsgType.RFID);
-//            UpLoad upLoad = new UpLoad();
-//            upLoad.setId("1");
-//            upLoad.setDeviceId("");
-//            upLoad.setCreateTime("");
-//            upLoad.setAssetList(addData);
-//            message.setResponseMessage(upLoad);
-//            InstructUtils.send(message);
-
-            UpAssetsBean upAssetsBean=new UpAssetsBean();
-
-            UpAssetsBean.RfidIdBean.ResponseMessageBean responseMessageBean=new UpAssetsBean.RfidIdBean.ResponseMessageBean();
-            responseMessageBean.setAssetList(addData);
-
-            UpAssetsBean.RfidIdBean rfidIdBean=new UpAssetsBean.RfidIdBean();
-            rfidIdBean.setId(1);
-            rfidIdBean.setResponseMessage(responseMessageBean);
-
-
-            upAssetsBean.setRfidId(rfidIdBean);
-
-mPresenter.getListByRfid(upAssetsBean);
-
-
-
+            getRfid(search_edit.getText().toString());
         } else if (i == R.id.search_history_clear_all_tv) {
             mPresenter.clearHistoryData();
         } else if (i == R.id.search_back_ib) {
@@ -161,43 +133,59 @@ mPresenter.getListByRfid(upAssetsBean);
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                if (ChannelMap.getChannel("1") != null) {
-                    List<AssetsBean> addData = new ArrayList<>();
-                    AssetsBean assetsBean = new AssetsBean(null, null, mList.get(position).getData(), "", 0, "", "", "", "", "", "", DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL), "", "", "", "", 4, 0);
-                    addData.add(assetsBean);
 
-                    Message message = new Message();
-                    message.setId(1);
-                    message.setType(MsgType.RFID);
-
-                    UpLoad upLoad = new UpLoad();
-                    upLoad.setId("1");
-                    upLoad.setDeviceId("");
-                    upLoad.setCreateTime("");
-                    upLoad.setAssetList(addData);
-
-                    message.setResponseMessage(upLoad);
-                    ChannelMap.getChannel("1").writeAndFlush(new TextWebSocketFrame(GsonUtil.GsonString(message)));
-                    Log.e("INFO_SEARCH_RFID", "" + GsonUtil.GsonString(message));
-                } else {
-                    ToastUtil.showToast("未连接");
-                }
-
+                getRfid(mList.get(position).getData());
             }
+
+
         });
     }
 
+    private void getRfid(String taskid) {
+
+//                    List<AssetsBean> addData = new ArrayList<>();
+//                    AssetsBean assetsBean = new AssetsBean(null, null, taskid,"", 0, "", "", "", "", "", "", DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL), "", "", "", "", 4, 0);
+//                    assetsBean.setTime(System.currentTimeMillis());
+//                    addData.add(assetsBean);
+//
+//                    Message message = new Message();
+//                    message.setId(1);
+//                    message.setType(MsgType.RFID);
+//                    UpLoad upLoad = new UpLoad();
+//                    upLoad.setId("1");
+//                    upLoad.setDeviceId("");
+//                    upLoad.setCreateTime("");
+//                    upLoad.setAssetList(addData);
+//                    message.setResponseMessage(upLoad);
+//                    InstructUtils.send(message);
+
+        List<AssetsBean> addData = new ArrayList<>();
+//            AssetsBean assetsBean = new AssetsBean(null, null, search_edit.getText().toString(), "123", 4, "", "", "", "", "", "", DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL), "", "", "", "", 4, 0);
+        AssetsBean assetsBean = new AssetsBean(null, null, taskid, "", 0, "", "", "", "", "", "", "", "", "", "", "", 4, 0);
+        assetsBean.setTime(System.currentTimeMillis());
+        addData.add(assetsBean);
+        Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
+        if (location == null) {
+            return;
+        }
+        UpAssetsBean upAssetsBean = new UpAssetsBean();
+        UpAssetsBean.RfidIdBean.ResponseMessageBean responseMessageBean = new UpAssetsBean.RfidIdBean.ResponseMessageBean();
+        responseMessageBean.setAssetList(addData);
+        responseMessageBean.setDeviceId(location.getId());
+        UpAssetsBean.RfidIdBean rfidIdBean = new UpAssetsBean.RfidIdBean();
+        rfidIdBean.setId(1);
+        rfidIdBean.setResponseMessage(responseMessageBean);
+        upAssetsBean.setRfidId(rfidIdBean);
+        mPresenter.getListByRfid(upAssetsBean);
+    }
 
     @Override
     protected void initEventAndData() {
-
-
 //        initRecyclerView();
 //        mRecyclerView.setAdapter(mAdapter);
 //        mPresenter.loadAllHistoryData();
 
     }
-
 
     @Override
     public void loadAllHistoryData(List<HistoryData> list) {
@@ -206,7 +194,6 @@ mPresenter.getListByRfid(upAssetsBean);
 
     @Override
     public void addHistoryData(String data) {
-
     }
 
     @Override
@@ -224,6 +211,16 @@ mPresenter.getListByRfid(upAssetsBean);
                 AssetsBean assetsBean = list.get(0);
                 start(AssetsDetailsFragment.newInstance(assetsBean));
             }
+        }
+    }
+
+    //接口接收
+    @Override
+    public void receiveResult(ArrayList<AssetsBean> list) {
+        if (list.size() > 0) {
+            mPresenter.addHistoryData(search_edit.getText().toString());
+            AssetsBean assetsBean = list.get(0);
+            start(AssetsDetailsFragment.newInstance(assetsBean));
         }
     }
 

@@ -84,7 +84,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        ImmersionBar.with(this).destroy();
     }
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
@@ -96,41 +95,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 EventBusUtils.sendEvent(new Event(EventBusTags.THREE), EventBusTags.JUMP_PAGE);
             }
         }
-
-
-//        ImmersionBar.with(this).init();
-        //同时请求多个权限
-//       new RxPermissions(MainActivity.this)
-//                .requestEach(
-//                        Manifest.permission.READ_PHONE_STATE  ,
-//                        Manifest.permission.CAMERA  ,
-//                        Manifest.permission.READ_EXTERNAL_STORAGE ,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE )//多个权限用","隔开
-//               .subscribe(new Consumer<Permission>() {
-//                   @Override
-//                   public void accept(Permission permission) throws Exception {
-//                       if (permission.granted) {
-//                           // 用户已经同意该权限
-//                           LogUtils.debugInfo("testRxPermission CallBack onPermissionsGranted() : "+permission.name+
-//                                   " request granted , to do something...");
-//                           //todo somthing
-//                       }
-//                       else if (permission.shouldShowRequestPermissionRationale) {
-//                           // 用户拒绝了该权限，没有选中『不再询问』（Never ask again）,那么下次再次启动时。还会提示请求权限的对话框
-//                           LogUtils.debugInfo("testRxPermission CallBack onPermissionsDenied() : " + permission.name + "request denied");
-//                           //todo request permission again
-//                           ToastUtil.showToast("拒绝权限，等待下次询问哦");
-//                       }
-//                       else {
-//                           // 用户拒绝了该权限，而且选中『不再询问』
-//                           LogUtils.debugInfo("testRxPermission CallBack onPermissionsDenied() : this " + permission.name + " is denied " +
-//                                   "and never ask again");
-//                           ToastUtil.showToast( "拒绝权限，不再弹出询问框，请前往APP应用设置中打开此权限");
-//                           //todo nothing
-//                       }
-//                   }
-//               });
-
 
         PermissionUtil.requestPermission(new PermissionUtil.RequestPermission() {
             @Override
@@ -164,16 +128,19 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 Manifest.permission.READ_EXTERNAL_STORAGE ,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE );
 
-        if (ServiceUtils.isServiceRunning(this, "com.idealbank.module_main.app.service.TestOneService")) {
-            ToastUtil.showToast("服务已开启");
-        } else {
-            Intent intentFive = new Intent(this, TestOneService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-               startForegroundService(intentFive);
-            } else {
-                startService(intentFive);
-            }
-        }
+
+//        if (ServiceUtils.isServiceRunning(this, "com.idealbank.module_main.app.service.TestOneService")) {
+//            ToastUtil.showToast("服务已开启");
+//        } else {
+//            Intent intentFive = new Intent(this, TestOneService.class);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//               startForegroundService(intentFive);
+//            } else {
+//                startService(intentFive);
+//            }
+//        }
+
+
     }
     @Inject
     RxErrorHandler mErrorHandler;

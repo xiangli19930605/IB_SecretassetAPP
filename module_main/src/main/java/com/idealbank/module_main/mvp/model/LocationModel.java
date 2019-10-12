@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.google.gson.Gson;
 import com.idealbank.module_main.bean.Location;
-import com.idealbank.module_main.bean.OfflineBeanRequest;
 import com.idealbank.module_main.mvp.model.api.Api;
 import com.jess.arms.integration.IRepositoryManager;
 import com.jess.arms.mvp.BaseModel;
@@ -13,21 +12,19 @@ import com.jess.arms.di.scope.FragmentScope;
 
 import javax.inject.Inject;
 
-import com.idealbank.module_main.mvp.contract.ForthContract;
+import com.idealbank.module_main.mvp.contract.LocationContract;
 
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
-import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
-import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
 
 
 /**
  * ================================================
  * Description:
  * <p>
- * Created by MVPArmsTemplate on 02/19/2019 09:45
+ * Created by MVPArmsTemplate on 10/10/2019 13:33
  * <a href="mailto:jess.yan.effort@gmail.com">Contact me</a>
  * <a href="https://github.com/JessYanCoding">Follow me</a>
  * <a href="https://github.com/JessYanCoding/MVPArms">Star me</a>
@@ -36,14 +33,14 @@ import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
  * ================================================
  */
 @FragmentScope
-public class ForthModel extends BaseModel implements ForthContract.Model {
+public class LocationModel extends BaseModel implements LocationContract.Model {
     @Inject
     Gson mGson;
     @Inject
     Application mApplication;
 
     @Inject
-    public ForthModel(IRepositoryManager repositoryManager) {
+    public LocationModel(IRepositoryManager repositoryManager) {
         super(repositoryManager);
     }
 
@@ -58,10 +55,4 @@ public class ForthModel extends BaseModel implements ForthContract.Model {
         return mRepositoryManager.obtainRetrofitService(Api.class)
                 .getLocationList();
     }
-    @Override
-    public Observable<BaseResponseBean<ArrayList<OffLineAssetsBean>>> getOffLinePermissionList(OfflineBeanRequest offlineBeanRequest){
-        return mRepositoryManager.obtainRetrofitService(Api.class)
-                .getOffLinePermissionList( offlineBeanRequest);
-    }
-
 }

@@ -1,7 +1,10 @@
 package com.idealbank.module_main.mvp.model.api;
 
 import com.idealbank.module_main.bean.Location;
+import com.idealbank.module_main.bean.LoginBeanRequest;
+import com.idealbank.module_main.bean.OfflineBeanRequest;
 import com.idealbank.module_main.bean.UpAssetsBean;
+import com.idealbank.module_main.bean.UpLoadAssetsBean;
 import com.idealbank.module_main.mvp.model.entity.UpLoad;
 
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.ArrayList;
 import io.reactivex.Observable;
 import me.jessyan.armscomponent.commonsdk.bean.BaseResponseBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
+import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -41,20 +45,31 @@ public interface Api {
             @Query("category") String category,
             @Query("max_behot_time") String maxBehotTime);
 
-
-    @POST("http://localhost:8092//sacs/pda/login" + "")
+    //登录
+    @Headers({DOMAIN_NAME_HEADER + Constants.WANGYI_DOMAIN_NAME})
+    @POST("/sacs/pda/login")
     Observable<AssetsBean> login(
-            @Query("category") String category,
-            @Query("max_behot_time") String maxBehotTime);
+            @Body LoginBeanRequest loginBeanRequest);
 
-
-    @Headers({DOMAIN_NAME_HEADER+ Constants.WANGYI_DOMAIN_NAME })
-    @POST("/sacs/terminal/inspection/getLocationList")
+    //获取地址
+    @Headers({DOMAIN_NAME_HEADER + Constants.WANGYI_DOMAIN_NAME})
+    @POST("/sacs/pda/getRfidLocationList")
     Observable<BaseResponseBean<ArrayList<Location>>> getLocationList();
 
+    //查询
+    @Headers({DOMAIN_NAME_HEADER + Constants.WANGYI_DOMAIN_NAME})
+    @POST("/sacs/pda/getListByRfid")
+    Observable<BaseResponseBean<ArrayList<AssetsBean>>> getListByRfid(@Body UpAssetsBean task);
 
-    @Headers({DOMAIN_NAME_HEADER+ Constants.WANGYI_DOMAIN_NAME })
-    @POST("/sacs/terminal/inspection/getListByRfid")
-    Observable<BaseResponseBean<UpLoad>> getListByRfid(@Body UpAssetsBean task);
+    //上传
+    @Headers({DOMAIN_NAME_HEADER + Constants.WANGYI_DOMAIN_NAME})
+    @POST("/sacs/pda/saveCheckTask")
+    Observable<BaseResponseBean> saveCheckTask(@Body UpLoadAssetsBean upLoadAssetsBean);
 
+
+    //离线数据
+    @Headers({DOMAIN_NAME_HEADER + Constants.WANGYI_DOMAIN_NAME})
+    @POST("sacs/pda/getOffLinePermissionList")
+    Observable<BaseResponseBean<ArrayList<OffLineAssetsBean>>> getOffLinePermissionList(
+            @Body OfflineBeanRequest offlineBeanRequest);
 }
