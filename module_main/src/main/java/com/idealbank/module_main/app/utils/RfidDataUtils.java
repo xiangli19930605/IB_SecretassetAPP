@@ -65,7 +65,36 @@ public class RfidDataUtils {
         return false;
     }
 
+    //处理离线
+    public static void changeOffline(List<AssetsBean> list,String taskid) {
+        for (int i = 0; i < list.size(); i++) {
+            //数据库查询   rfid  离线数据
+            OffLineAssetsBean offLineAssetsBean = new DbManager().queryOffLineAssetsBeanWhereRfid(list.get(i).getRfidId());
+            AssetsBean assetsBean = new DbManager().queryAssetsBeanWhereTaskidAndRfid(taskid, list.get(i).getRfidId());
 
+            //判断数据库是否有这个数据，有则判断时间，没有则直接不授权
+            if (offLineAssetsBean == null) {
+                assetsBean.setPermissionState(3);
+            } else {
+                //根据时间判断  逾期 设置1 未逾期0
+                assetsBean.setPermissionState(DateUtils.compartoNow(offLineAssetsBean.getEndTime()) ? 1 : 0);
+                assetsBean.setAssetUser(offLineAssetsBean.getAssetUser());
+                assetsBean.setBelongDept(offLineAssetsBean.getBelongDept());
+                assetsBean.setLastApproveUser(offLineAssetsBean.getLastApproveUser());
+                assetsBean.setId(offLineAssetsBean.getId());
+                assetsBean.setOutBillId(offLineAssetsBean.getOutBillId());
+                assetsBean.setAssetId(offLineAssetsBean.getAssetId());
+                assetsBean.setAssetState(offLineAssetsBean.getAssetState());
+                assetsBean.setEndTime(offLineAssetsBean.getEndTime());
+                assetsBean.setAssetName(offLineAssetsBean.getAssetName());
+                assetsBean.setTypeId(offLineAssetsBean.getTypeId());
+                assetsBean.setAssetBrand(offLineAssetsBean.getAssetBrand());
+                assetsBean.setAssetModel(offLineAssetsBean.getAssetModel());
+            }
+            new DbManager().upAssetsBeanWhereId(assetsBean);
+        }
+
+    }
 
 
 }

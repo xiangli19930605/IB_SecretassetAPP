@@ -34,6 +34,7 @@ import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.TaskBean;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
+import me.jessyan.armscomponent.commonsdk.utils.CommonUtils;
 import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
 import me.jessyan.armscomponent.commonsdk.utils.EventBusUtils;
 import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
@@ -236,7 +237,12 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 //                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
 //                getDate();
 //            }
-            mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+
+            if(CommonUtils.isNetworkConnected()){
+                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+            }else{
+                RfidDataUtils.changeOffline(addData,taskid);
+            }
 
 
         } else if (id == R.id.btn_query) {
@@ -258,7 +264,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                 }
                 EventBusUtils.sendEvent(new Event(addData), EventBusTags.SEARCH_RFID);
             } else {
-                changeOffline(mList);
+                InstructUtils.send(InstructUtils.getRFIDMessage(mList));
             }
         }
 
@@ -272,38 +278,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     }
 
 
-    //处理离线
-    private void changeOffline(List<AssetsBean> list) {
-        for (int i = 0; i < list.size(); i++) {
-            //数据库查询   rfid  离线数据
-            OffLineAssetsBean offLineAssetsBean = new DbManager().queryOffLineAssetsBeanWhereRfid(list.get(i).getRfidId());
-            AssetsBean assetsBean = new DbManager().queryAssetsBeanWhereTaskidAndRfid(taskid, list.get(i).getRfidId());
 
-            //判断数据库是否有这个数据，有则判断时间，没有则直接不授权
-            if (offLineAssetsBean == null) {
-                assetsBean.setPermissionState(3);
-            } else {
-                //根据时间判断  逾期 设置1 未逾期0
-                assetsBean.setPermissionState(DateUtils.compartoNow(offLineAssetsBean.getEndTime()) ? 1 : 0);
-                assetsBean.setAssetUser(offLineAssetsBean.getAssetUser());
-                assetsBean.setBelongDept(offLineAssetsBean.getBelongDept());
-                assetsBean.setLastApproveUser(offLineAssetsBean.getLastApproveUser());
-                assetsBean.setId(offLineAssetsBean.getId());
-                assetsBean.setOutBillId(offLineAssetsBean.getOutBillId());
-                assetsBean.setAssetId(offLineAssetsBean.getAssetId());
-                assetsBean.setAssetState(offLineAssetsBean.getAssetState());
-                assetsBean.setEndTime(offLineAssetsBean.getEndTime());
-                assetsBean.setAssetName(offLineAssetsBean.getAssetName());
-                assetsBean.setTypeId(offLineAssetsBean.getTypeId());
-                assetsBean.setAssetBrand(offLineAssetsBean.getAssetBrand());
-                assetsBean.setAssetModel(offLineAssetsBean.getAssetModel());
-            }
-
-            new DbManager().upAssetsBeanWhereId(assetsBean);
-            getDate();
-        }
-
-    }
 
 
     @Override
@@ -335,7 +310,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         }
     }
 
-    //接受手持机扫描
+    //接受手持机扫描  RFID
     @Subscriber(tag = EventBusTags.SCANRFID)
     private void scaanRfid(Event event) {
         //位于栈顶才接收
@@ -353,31 +328,19 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
             new DbManager().insertAssetsBean(assetsBean);
             getDate();
             //判断是否离线，离线访问离线数据库，不是离线，访问请求
-            if (UsbUtils.getUsbType()) {
-//                Message message = new Message();
-//                message.setId(1);
-//                message.setType(MsgType.RFID);
-//                UpLoad upLoad = new UpLoad();
-//                upLoad.setId("1");
-//                upLoad.setDeviceId("");
-//                upLoad.setCreateTime(createTime);
-//                upLoad.setAssetList(addData);
-//                message.setResponseMessage(upLoad);
-//                InstructUtils.send(message);
-
-                UpAssetsBean upAssetsBean = new UpAssetsBean();
-                UpAssetsBean.RfidIdBean.ResponseMessageBean responseMessageBean = new UpAssetsBean.RfidIdBean.ResponseMessageBean();
-                responseMessageBean.setAssetList(addData);
-                UpAssetsBean.RfidIdBean rfidIdBean = new UpAssetsBean.RfidIdBean();
-                rfidIdBean.setId(1);
-                rfidIdBean.setResponseMessage(responseMessageBean);
-                upAssetsBean.setRfidId(rfidIdBean);
-
-                mPresenter.getListByRfid(upAssetsBean);
-
-            } else {
-                changeOffline(addData);
+            //            if (UsbUtils.getUsbType()) {
+//                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
+//
+//            } else {
+//                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
+//                getDate();
+//            }
+            if(CommonUtils.isNetworkConnected()){
+                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+            }else{
+                RfidDataUtils.changeOffline(addData,taskid);
             }
+
         }
     }
 
@@ -456,7 +419,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                     message.setResponseMessage(upLoad);
                     InstructUtils.send(message);
                 } else {
-                    changeOffline(addData);
+//                    changeOffline(addData);
                 }
             }
         });
