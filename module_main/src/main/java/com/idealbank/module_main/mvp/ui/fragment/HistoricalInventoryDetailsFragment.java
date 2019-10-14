@@ -49,6 +49,12 @@ public class HistoricalInventoryDetailsFragment extends BaseActionBarFragment<Hi
 
     @BindView(R2.id.recyclerView)
     RecyclerView mRecyclerView;
+    @BindView(R2.id.stv_taskid)
+    SuperTextView stv_taskid;
+    @BindView(R2.id.stv_createTime)
+    SuperTextView stv_createTime;
+    @BindView(R2.id.stv_num)
+    SuperTextView stv_num;
     @BindView(R2.id.tv_result)
     SuperTextView tv_result;
     @Inject
@@ -90,8 +96,19 @@ public class HistoricalInventoryDetailsFragment extends BaseActionBarFragment<Hi
         getDate();
         setTitleText("历史详情");
         Drawable titleDrawable;
-        titleDrawable = getResources().getDrawable(R.mipmap.ic_no);
-        tv_result.setCenterTvDrawableRight(titleDrawable);
+        String flag;
+        if (taskBean.getPassFlag() == 0) {
+            titleDrawable = getResources().getDrawable(R.mipmap.ic_yes);
+            flag = "允许通行";
+        } else {
+            flag = "拒绝通行";
+            titleDrawable = getResources().getDrawable(R.mipmap.ic_no);
+        }
+        tv_result.setCenterTvDrawableRight(titleDrawable).setCenterString(flag + "(" + taskBean.getReason() + ")");
+
+        stv_taskid.setCenterString(taskBean.getTaskid());
+        stv_createTime.setCenterString(taskBean.getCreateTime());
+        stv_num.setCenterString(""+taskBean.getNumber());
     }
 
     private void getDate() {

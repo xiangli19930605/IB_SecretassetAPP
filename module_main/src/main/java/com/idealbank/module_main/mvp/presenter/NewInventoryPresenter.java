@@ -23,6 +23,7 @@ import me.jessyan.rxerrorhandler.handler.RetryWithDelay;
 import javax.inject.Inject;
 
 import com.idealbank.module_main.mvp.contract.NewInventoryContract;
+import com.jess.arms.utils.ArmsUtils;
 import com.jess.arms.utils.RxLifecycleUtils;
 
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
     }
 
     public void saveCheckTask(UpLoadAssetsBean upLoadAssetsBean) {
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
         mModel.saveCheckTask(upLoadAssetsBean)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
@@ -102,8 +104,11 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
                 .subscribe(new ErrorHandleSubscriber<BaseResponseBean>(mErrorHandler) {
                     @Override
                     public void onNext(BaseResponseBean assetsBean) {
-
-
+                        if (assetsBean.getState()==1) {
+                            mRootView.upLoadResult();
+                        }else{
+                            ArmsUtils.snackbarText(assetsBean.getMessage());
+                        }
                     }
                 });
     }

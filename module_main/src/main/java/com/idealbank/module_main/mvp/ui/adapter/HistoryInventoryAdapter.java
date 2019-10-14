@@ -43,6 +43,7 @@ import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.TaskBean;
 public class HistoryInventoryAdapter extends BaseQuickAdapter<TaskBean, BaseViewHolder> {
     private AppComponent mAppComponent;
     private ImageLoader mImageLoader;//用于加载图片的管理类,默认使用 Glide,使用策略模式,可替换框架
+
     public HistoryInventoryAdapter(@Nullable List data) {
         super(R.layout.item_rv_historyinventory, data);
     }
@@ -50,20 +51,26 @@ public class HistoryInventoryAdapter extends BaseQuickAdapter<TaskBean, BaseView
     @Override
     protected void convert(BaseViewHolder helper, TaskBean data) {
 
-        Drawable titleDrawable ;
-        titleDrawable  = mContext.getResources().getDrawable(R.mipmap.ic_yes);
-        titleDrawable  = mContext.getResources().getDrawable(R.mipmap.ic_no);
-        ((SuperTextView) helper.getView(R.id.tv_result)).setCenterTvDrawableRight(titleDrawable);
+        Drawable titleDrawable;
+
+        String flag;
+        if (data.getPassFlag() == 0) {
+            titleDrawable = mContext.getResources().getDrawable(R.mipmap.ic_yes);
+            flag = "允许通行";
+        } else {
+            flag = "拒绝通行";
+            titleDrawable = mContext.getResources().getDrawable(R.mipmap.ic_no);
+        }
+
+        ((SuperTextView) helper.getView(R.id.tv_result)).setCenterTvDrawableRight(titleDrawable).setCenterString(flag + "(" + data.getReason() + ")");
 
 
         ((SuperTextView) helper.getView(R.id.stv_createTime)).setCenterString(data.getCreateTime());
-        ((SuperTextView) helper.getView(R.id.stv_num)).setCenterString(""+data.getNumber());
+        ((SuperTextView) helper.getView(R.id.stv_num)).setCenterString("" + data.getNumber());
         ((SuperTextView) helper.getView(R.id.stv_taskid)).setCenterString(data.getTaskid());
 
         helper.addOnClickListener(R.id.content).addOnClickListener(R.id.right_menu_1);
-        }
-
-
+    }
 
 
 }

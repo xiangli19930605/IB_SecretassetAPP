@@ -30,6 +30,8 @@ public class TaskBeanDao extends AbstractDao<TaskBean, Long> {
         public final static Property CreateTime = new Property(3, String.class, "createTime", false, "CREATE_TIME");
         public final static Property FinishTime = new Property(4, String.class, "finishTime", false, "FINISH_TIME");
         public final static Property Number = new Property(5, int.class, "number", false, "NUMBER");
+        public final static Property PassFlag = new Property(6, int.class, "passFlag", false, "PASS_FLAG");
+        public final static Property Reason = new Property(7, String.class, "reason", false, "REASON");
     }
 
 
@@ -50,7 +52,9 @@ public class TaskBeanDao extends AbstractDao<TaskBean, Long> {
                 "\"STATE\" INTEGER NOT NULL ," + // 2: state
                 "\"CREATE_TIME\" TEXT," + // 3: createTime
                 "\"FINISH_TIME\" TEXT," + // 4: finishTime
-                "\"NUMBER\" INTEGER NOT NULL );"); // 5: number
+                "\"NUMBER\" INTEGER NOT NULL ," + // 5: number
+                "\"PASS_FLAG\" INTEGER NOT NULL ," + // 6: passFlag
+                "\"REASON\" TEXT);"); // 7: reason
     }
 
     /** Drops the underlying database table. */
@@ -84,6 +88,12 @@ public class TaskBeanDao extends AbstractDao<TaskBean, Long> {
             stmt.bindString(5, finishTime);
         }
         stmt.bindLong(6, entity.getNumber());
+        stmt.bindLong(7, entity.getPassFlag());
+ 
+        String reason = entity.getReason();
+        if (reason != null) {
+            stmt.bindString(8, reason);
+        }
     }
 
     @Override
@@ -111,6 +121,12 @@ public class TaskBeanDao extends AbstractDao<TaskBean, Long> {
             stmt.bindString(5, finishTime);
         }
         stmt.bindLong(6, entity.getNumber());
+        stmt.bindLong(7, entity.getPassFlag());
+ 
+        String reason = entity.getReason();
+        if (reason != null) {
+            stmt.bindString(8, reason);
+        }
     }
 
     @Override
@@ -126,7 +142,9 @@ public class TaskBeanDao extends AbstractDao<TaskBean, Long> {
             cursor.getInt(offset + 2), // state
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // createTime
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // finishTime
-            cursor.getInt(offset + 5) // number
+            cursor.getInt(offset + 5), // number
+            cursor.getInt(offset + 6), // passFlag
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // reason
         );
         return entity;
     }
@@ -139,6 +157,8 @@ public class TaskBeanDao extends AbstractDao<TaskBean, Long> {
         entity.setCreateTime(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setFinishTime(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setNumber(cursor.getInt(offset + 5));
+        entity.setPassFlag(cursor.getInt(offset + 6));
+        entity.setReason(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     @Override

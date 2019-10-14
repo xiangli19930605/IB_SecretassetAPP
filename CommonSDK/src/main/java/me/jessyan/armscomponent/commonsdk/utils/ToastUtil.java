@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import me.jessyan.armscomponent.commonsdk.R;
 import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 
@@ -75,7 +76,7 @@ public class ToastUtil {
         }
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 12, 20);
-      View toastLayout=  LayoutInflater.from(MyApplication.getApplication()).inflate(R.layout.common_toast, null);
+        View toastLayout=  LayoutInflater.from(MyApplication.getApplication()).inflate(R.layout.common_toast, null);
         TextView txtToast = (TextView) toastLayout.findViewById(R.id.txt_toast);
         Drawable titleDrawable;
         if(type==TPYE_SUCCESS){

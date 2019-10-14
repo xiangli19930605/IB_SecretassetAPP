@@ -44,6 +44,18 @@ public class DbManager implements DbHelper , PreferenceHelper {
     }
 
     @Override
+    public TaskBean getTaskBeanWhereSWhereId(Long data) {
+        return MyApplication.mComponent
+                .getAppDataManager().getTaskBeanWhereSWhereId(data);
+    }
+
+    @Override
+    public void upDateTaskBeanWhereId(Long data, TaskBean taskBean) {
+        MyApplication.mComponent
+                .getAppDataManager().upDateTaskBeanWhereId(data,taskBean);
+    }
+
+    @Override
     public void upDateTaskBeanWhereId(Long data, int state) {
         MyApplication.mComponent
                 .getAppDataManager().upDateTaskBeanWhereId( data,  state);

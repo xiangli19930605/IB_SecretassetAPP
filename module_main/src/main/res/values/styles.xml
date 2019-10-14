@@ -5,7 +5,8 @@
 
     //普通textview
     <style name="TextView_commom" tools:ignore="ResourceName">
-        <item name="android:layout_height">@dimen/dp_26</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/dp_26</item>
         <item name="android:layout_width">match_parent</item>
         <item name="sDividerLineType">none</item>
         <item name="sLeftViewWidth">0dp</item>

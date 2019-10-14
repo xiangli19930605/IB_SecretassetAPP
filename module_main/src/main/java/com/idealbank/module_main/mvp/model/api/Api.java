@@ -48,7 +48,7 @@ public interface Api {
     //登录
     @Headers({DOMAIN_NAME_HEADER + Constants.WANGYI_DOMAIN_NAME})
     @POST("/sacs/pda/login")
-    Observable<AssetsBean> login(
+    Observable<BaseResponseBean> login(
             @Body LoginBeanRequest loginBeanRequest);
 
     //获取地址

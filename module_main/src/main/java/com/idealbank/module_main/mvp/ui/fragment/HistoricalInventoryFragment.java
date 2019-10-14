@@ -106,22 +106,22 @@ public class HistoricalInventoryFragment extends BaseRootFragment<HistoricalInve
 
     private void getDate() {
 
-        if (UsbUtils.getUsbType()) {
-            Message message = new Message();
-            message.setId(1);
-            message.setType(MsgType.HISTORY);
-            if (InstructUtils.send(message)) {
-            } else {
-                mAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
-            }
-        } else {
+//        if (UsbUtils.getUsbType()) {
+//            Message message = new Message();
+//            message.setId(1);
+//            message.setType(MsgType.HISTORY);
+//            if (InstructUtils.send(message)) {
+//            } else {
+//                mAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
+//            }
+//        } else {}
             mList = new DbManager().queryTaskBeanWhereState(1);
             Collections.reverse(mList);
             mAdapter.replaceData(mList);
             if (mList.size() == 0) {
                 mAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
             }
-        }
+
         refreshLayout.finishRefresh();
     }
 

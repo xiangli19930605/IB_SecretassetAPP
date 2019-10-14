@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 
 public interface DialogType {
 
-    @IntDef({DEFAULT, INPUT, COUNT, NO_TITLE, BOTTOM_IN,SUCCESS,FAILURE,SINGLECHOICE,MULTICHOICE,ADDASSET,QUERY})
+    @IntDef({DEFAULT, INPUT, COUNT, NO_TITLE, BOTTOM_IN,SUCCESS,FAILURE,SINGLECHOICE,MULTICHOICE,ADDASSET,QUERY,LOGIN})
     @Retention(RetentionPolicy.SOURCE)
     @interface Type {
     }
@@ -27,6 +27,7 @@ public interface DialogType {
     int MULTICHOICE = 8;//
     int ADDASSET = 9;//
     int QUERY = 10;//
+    int LOGIN = 11;//
 
 
 }

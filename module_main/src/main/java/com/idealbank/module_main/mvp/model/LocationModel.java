@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.google.gson.Gson;
 import com.idealbank.module_main.bean.Location;
+import com.idealbank.module_main.bean.LoginBeanRequest;
 import com.idealbank.module_main.mvp.model.api.Api;
 import com.jess.arms.integration.IRepositoryManager;
 import com.jess.arms.mvp.BaseModel;
@@ -54,5 +55,10 @@ public class LocationModel extends BaseModel implements LocationContract.Model {
     public Observable<BaseResponseBean<ArrayList<Location>>> getLocationList(){
         return mRepositoryManager.obtainRetrofitService(Api.class)
                 .getLocationList();
+    }
+    @Override
+    public Observable<BaseResponseBean> login(LoginBeanRequest loginBeanRequest){
+        return mRepositoryManager.obtainRetrofitService(Api.class)
+                .login(loginBeanRequest);
     }
 }

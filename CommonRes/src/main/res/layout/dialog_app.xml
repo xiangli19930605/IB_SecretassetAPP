@@ -8,22 +8,23 @@
     android:orientation="vertical">
 
     <!--<LinearLayout-->
-       <!---->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center">-->
+    <!---->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center">-->
 
-        <!---->
+    <!---->
 
     <!--</LinearLayout>-->
     <ImageView
         android:id="@+id/ll_top"
-        android:visibility="gone"
-        android:layout_marginBottom="-24dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="-24dp"
         android:background="@color/transparent"
-        android:src="@drawable/ic_edit_round" />
+        android:src="@drawable/ic_edit_round"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/ll_center"
         android:layout_width="330dp"
@@ -71,6 +72,73 @@
                 android:minWidth="200dp"
                 android:textCursorDrawable="@null"
                 android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/ll_login"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+               >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_50"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="账号:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/edt_account"
+                        style="@style/TextStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:background="@drawable/stroke_hollow_white_shape"
+                        android:gravity="center_vertical"
+                        android:minWidth="200dp"
+                        android:textCursorDrawable="@null" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_50"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="密码:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/edt_pwd"
+                        style="@style/TextStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:background="@drawable/stroke_hollow_white_shape"
+                        android:gravity="center_vertical"
+                        android:inputType="textPassword"
+                        android:minWidth="200dp"
+                        android:textCursorDrawable="@null" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycleView"

@@ -70,7 +70,12 @@ public class AppDialog {
     RecyclerView mRecyclerView;
     @BindView(R2.id.ll_content_layout)
     LinearLayout contentLayout;//中间弹出对话框的View
-
+    @BindView(R2.id.ll_login)
+    LinearLayout loginLayout;
+    @BindView(R2.id.edt_account)
+    EditText edtAccount;
+    @BindView(R2.id.edt_pwd)
+    EditText edtPwd;
 
     @BindView(R2.id.ll_bottom)
     LinearLayout llBottom;//底部弹出的Dialog 父View
@@ -92,16 +97,17 @@ public class AppDialog {
 
     private OnButtonClickListener leftListener;
     private OnButtonClickListener rightListener;
+    private OnLoginButtonClickListener loginListener;
     private OnSingleSelectButtonClickListener singleSelectListener;
     private OnSelectButtonClickListener selectListener;
     private OnItemClickListener itemClickListener;
     private String title;//标题
     Drawable titleDrawable;//标题图片
-    private List<String>   datas = new ArrayList<>();
+    private List<String> datas = new ArrayList<>();
 
     private List<String> selectDatas = new ArrayList<>();//选中的选项
     //单选项
-    private String  singleSelect="";
+    private String singleSelect = "";
     SingleAdapter mSingleAdapter;//单选
     MultiAdapter mMultiAdapter;//多选
 
@@ -144,6 +150,13 @@ public class AppDialog {
             case DialogType.INPUT:
                 setTitleText();
                 edtInput.setVisibility(View.VISIBLE);
+                tvContent.setVisibility(View.GONE);
+                llCountView.setVisibility(View.GONE);
+                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                break;
+            case DialogType.LOGIN:
+                setTitleText();
+                loginLayout.setVisibility(View.VISIBLE);
                 tvContent.setVisibility(View.GONE);
                 llCountView.setVisibility(View.GONE);
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -191,12 +204,15 @@ public class AppDialog {
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
                 mSingleAdapter = new SingleAdapter(datas);
                 mRecyclerView.setAdapter(mSingleAdapter);
-                if(datas.size()>0){mSingleAdapter.setSelection(0);singleSelect=datas.get(0);}
+                if (datas.size() > 0) {
+                    mSingleAdapter.setSelection(0);
+                    singleSelect = datas.get(0);
+                }
                 mSingleAdapter.setOnItemClickLitener(new OnItemClickLitener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         mSingleAdapter.setSelection(position);
-                        singleSelect=datas.get(position);
+                        singleSelect = datas.get(position);
                     }
                 });
                 break;
@@ -268,19 +284,21 @@ public class AppDialog {
      * @param type text
      * @return AppDialog
      */
-  public  static int REFUSE=1;
-    public  static int ALLOW=2;
+    public static int REFUSE = 1;
+    public static int ALLOW = 2;
+
     public AppDialog setItemType(int type) {
 //        datas = new ArrayList<>();
-        if (type==REFUSE) {
+        if (type == REFUSE) {
             datas.add("未授权物品没有通行权限");
             datas.add("安保部确认决绝通行");
-        }else{
+        } else {
             datas.add("安保部确认允许通行");
             datas.add("其他");
         }
         return this;
     }
+
     /**
      * 加减输入模式下 设置的数字
      *
@@ -365,6 +383,15 @@ public class AppDialog {
         }
         return this;
     }
+
+    public AppDialog setRightButton(String text, OnLoginButtonClickListener listener) {
+        this.loginListener = listener;
+        if (!TextUtils.isEmpty(text)) {
+            btnRight.setText(text);
+        }
+        return this;
+    }
+
     public AppDialog setRightButton(String text, OnSelectButtonClickListener listener) {
         this.selectListener = listener;
         if (!TextUtils.isEmpty(text)) {
@@ -372,6 +399,7 @@ public class AppDialog {
         }
         return this;
     }
+
     public AppDialog setRightButton(String text, OnSingleSelectButtonClickListener listener) {
         this.singleSelectListener = listener;
         if (!TextUtils.isEmpty(text)) {
@@ -564,9 +592,11 @@ public class AppDialog {
         } else if (v.getId() == R.id.btn_right) {
             if (type == DialogType.MULTICHOICE) {
                 onButtonClick(selectListener);
-            } else    if (type == DialogType.SINGLECHOICE) {
+            } else if (type == DialogType.SINGLECHOICE) {
                 onButtonClick(singleSelectListener);
-            }else{
+            } else if (type == DialogType.LOGIN) {
+                onButtonClick(loginListener);
+            } else {
                 onButtonClick(rightListener);
             }
         } else if (v.getId() == R.id.minus) {
@@ -641,6 +671,17 @@ public class AppDialog {
         dismiss();
     }
 
+    private void onButtonClick(OnLoginButtonClickListener listener) {
+        if (type == DialogType.LOGIN) {
+            if (listener != null) {
+                listener.onClick(edtAccount.getText().toString().trim(), edtPwd.getText().toString().trim());
+            }
+            KeyboardUtils.hideKeyboard(edtAccount);
+            KeyboardUtils.hideKeyboard(edtPwd);
+        }
+        dismiss();
+    }
+
     private void onButtonClick(OnSelectButtonClickListener listener) {
         if (type == DialogType.MULTICHOICE) {
             if (getCountEdtValue() >= minCount) {
@@ -652,6 +693,7 @@ public class AppDialog {
         }
         dismiss();
     }
+
     private void onButtonClick(OnSingleSelectButtonClickListener listener) {
         if (type == DialogType.SINGLECHOICE) {
             if (getCountEdtValue() >= minCount) {
@@ -760,11 +802,18 @@ public class AppDialog {
      */
     public interface OnButtonClickListener {
         void onClick(String val);
+
     }
 
     public interface OnSelectButtonClickListener {
         void onClick(List<String> selectDatas);
     }
+
+    //登录账号密码
+    public interface OnLoginButtonClickListener {
+        void onClick(String account, String pwd);
+    }
+
     public interface OnSingleSelectButtonClickListener {
         void onClick(String singleSelect);
     }

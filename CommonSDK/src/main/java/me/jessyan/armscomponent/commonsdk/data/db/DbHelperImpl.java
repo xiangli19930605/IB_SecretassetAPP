@@ -67,6 +67,16 @@ public class DbHelperImpl implements DbHelper {
     }
 
     @Override
+    public TaskBean getTaskBeanWhereSWhereId(Long data) {
+        return getTaskBeanDao(). queryBuilder().where(TaskBeanDao.Properties.Id.eq(data)).unique();
+    }
+
+    @Override
+    public void upDateTaskBeanWhereId(Long data, TaskBean taskBean) {
+        getTaskBeanDao().update(taskBean);
+    }
+
+    @Override
     public void upDateTaskBeanWhereId(Long data, int state) {
         TaskBean taskBean = getTaskBeanDao(). queryBuilder().where(TaskBeanDao.Properties.Id.eq(data)).unique();
         taskBean.setState(state);

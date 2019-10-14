@@ -26,6 +26,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.idealbank.module_main.R2;
 import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.bean.Location;
+import com.idealbank.module_main.bean.LoginBeanRequest;
 import com.idealbank.module_main.mvp.ui.adapter.MyAdapter;
 import com.idealbank.module_main.mvp.ui.adapter.SpinnerLocationAdapter;
 import com.idealbank.module_main.mvp.ui.view.CustomPopWindow;
@@ -47,6 +48,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import me.jessyan.armscomponent.commonres.dialog.AppDialog;
+import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseActionBarFragment;
 import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
 import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
@@ -96,8 +99,6 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
         setTitleText("地址设置");
 
 
-
-
         mPresenter.getLocationList();
         selectedItemperson = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
         if (selectedItemperson != null) {
@@ -127,10 +128,23 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
     void onViewClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_confim) {
-            if (!(selectedItemperson == null)) {
-                new DbManager().setLocation(GsonUtil.GsonString(selectedItemperson));
-                ToastUtil.showToast(ToastUtil.TPYE_SUCCESS, "修改成功");
-            }
+            new AppDialog(_mActivity, DialogType.LOGIN).setTitle("登录")
+                    .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+                        @Override
+                        public void onClick(String val) {
+                        }
+                    })
+                    .setRightButton("确定", new AppDialog.OnLoginButtonClickListener() {
+                                @Override
+                                public void onClick(String account, String pwd) {
+                                    mPresenter.login(new LoginBeanRequest(account, pwd));
+                                }
+                            }
+
+                    )
+                    .show();
+
+
         } else if (id == R.id.ll_spinner) {
             showPopListView();
         }
@@ -161,7 +175,7 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
         myAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                selectedItemperson=myAdapter.getData().get(position);
+                selectedItemperson = myAdapter.getData().get(position);
                 tvLocation.setText(selectedItemperson.getSpaceName());
                 mListPopWindow.dissmiss();
             }
@@ -178,5 +192,13 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
     @Override
     public void getLocation(ArrayList<Location> list) {
         myAdapter.replaceData(list);
+    }
+
+    @Override
+    public void loginResult() {
+        if (!(selectedItemperson == null)) {
+            new DbManager().setLocation(GsonUtil.GsonString(selectedItemperson));
+            ToastUtil.showToast(ToastUtil.TPYE_SUCCESS, "修改成功");
+        }
     }
 }

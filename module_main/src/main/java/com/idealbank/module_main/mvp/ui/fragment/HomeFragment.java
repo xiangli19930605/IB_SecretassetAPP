@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.idealbank.module_main.R2;
+import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.app.utils.Intents;
+import com.idealbank.module_main.bean.Location;
 import com.idealbank.module_main.mvp.contract.HomeContract;
 import com.idealbank.module_main.mvp.presenter.HomePresenter;
 import com.idealbank.module_main.mvp.ui.activity.TcpLinkActivity;
@@ -25,6 +27,8 @@ import com.idealbank.module_main.R;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import me.jessyan.armscomponent.commonres.dialog.AppDialog;
+import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseRootFragment;
 import me.jessyan.armscomponent.commonsdk.bean.Event;
@@ -32,6 +36,8 @@ import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
 import me.jessyan.armscomponent.commonsdk.core.RouterHub;
 import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
 import me.jessyan.armscomponent.commonsdk.utils.EventBusUtils;
+import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
+import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
 import me.jessyan.armscomponent.commonsdk.utils.Utils;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
@@ -82,7 +88,24 @@ public class HomeFragment extends BaseFragment<HomePresenter> implements HomeCon
         if (i == R.id.btn_search) {
             ((MainFragment) getParentFragment()).startBrotherFragment(SearchListFragment.newInstance());
         } else if (i == R.id.btn_scan) {
-            ((MainFragment) getParentFragment()).startBrotherFragment(NewInventoryFragment.newInstance());
+            Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
+            if (location == null) {
+                new AppDialog(_mActivity, DialogType.DEFAULT).setTitle("未设置通道门位置，是否前去设置？")
+                        .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+                            @Override
+                            public void onClick(String val) {
+                            }
+                        })
+                        .setRightButton("确定", new AppDialog.OnButtonClickListener() {
+                            @Override
+                            public void onClick(String val) {
+                                ((MainFragment) getParentFragment()).startBrotherFragment(LocationFragment.newInstance());
+                            }
+                        })
+                        .show();
+            }else{
+                ((MainFragment) getParentFragment()).startBrotherFragment(NewInventoryFragment.newInstance());
+            }
         } else if (i == R.id.btn_current) {
             EventBusUtils.sendEvent(new Event(EventBusTags.ONE), EventBusTags.JUMP_PAGE);
         } else if (i == R.id.btn_history) {

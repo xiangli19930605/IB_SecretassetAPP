@@ -64,6 +64,16 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public TaskBean getTaskBeanWhereSWhereId(Long data) {
+        return mDbHelper.getTaskBeanWhereSWhereId(data);
+    }
+
+    @Override
+    public void upDateTaskBeanWhereId(Long data, TaskBean taskBean) {
+        mDbHelper.upDateTaskBeanWhereId(data,taskBean);
+    }
+
+    @Override
     public void upDateTaskBeanWhereId(Long data, int state) {
          mDbHelper.upDateTaskBeanWhereId(data,state);
     }

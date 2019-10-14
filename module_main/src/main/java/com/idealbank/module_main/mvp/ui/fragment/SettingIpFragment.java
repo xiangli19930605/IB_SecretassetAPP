@@ -25,6 +25,8 @@ import com.idealbank.module_main.R;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import me.jessyan.armscomponent.commonres.dialog.AppDialog;
+import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseActionBarFragment;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
@@ -77,8 +79,8 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
     public void initData(@Nullable Bundle savedInstanceState) {
 
         setTitleText("服务器IP设置");
-        mEdtIP.setText( Constants.IP);
-        mEdtPort.setText( Constants.PORT);
+        mEdtIP.setText(Constants.IP);
+        mEdtPort.setText(Constants.PORT);
 
 
     }
@@ -87,10 +89,11 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
     void onViewClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_edit) {
-            Constants.IP=mEdtIP.getText().toString();
-            Constants.PORT=mEdtPort.getText().toString();
+            Constants.IP = mEdtIP.getText().toString();
+            Constants.PORT = mEdtPort.getText().toString();
 
-            ToastUtil.showToast(ToastUtil.TPYE_SUCCESS,"修改成功");
+            ToastUtil.showToast(ToastUtil.TPYE_SUCCESS, "修改成功");
+
         }
     }
 

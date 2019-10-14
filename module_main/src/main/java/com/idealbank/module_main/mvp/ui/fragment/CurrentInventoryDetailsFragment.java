@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.idealbank.module_main.Netty.ChannelMap;
@@ -63,6 +64,7 @@ import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.TaskBean;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
+import me.jessyan.armscomponent.commonsdk.utils.CommonUtils;
 import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
 import me.jessyan.armscomponent.commonsdk.utils.EventBusUtils;
 import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
@@ -95,8 +97,11 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
     @BindView(R2.id.tv_time)
     TextView tv_time;
     Boolean isopen = false;
+    private int passFlag;   //0允许，1拒绝
+    private String reason;   //理由
 
     public ONDEVMESSAGE OnMsg = new ONDEVMESSAGE();
+
     public static CurrentInventoryDetailsFragment newInstance(TaskBean taskBean) {
         CurrentInventoryDetailsFragment fragment = new CurrentInventoryDetailsFragment();
         Bundle bundle = new Bundle();
@@ -150,7 +155,7 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
         //先关闭盘点
         MyApplication.sv_Main.DoInventoryTag(false);
         // rfid power on
-        MyApplication. sv_Main.gpio_rfid_config(true);
+        MyApplication.sv_Main.gpio_rfid_config(true);
         Observable.interval(0, 1, TimeUnit.SECONDS)
                 .map(new Function<Long, Long>() {
                     @Override
@@ -165,20 +170,23 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
                     public void onSubscribe(Disposable d) {
                         mPresenter.addDispose(d);
                     }
+
                     @Override
                     public void onNext(Long count) {
                         for (int i = 0; i < mAdapter.getData().size(); i++) {
                             boolean b = System.currentTimeMillis() - mAdapter.getData().get(i).getTime() >= 5 * 1000;
-                            if (b&&mAdapter.getData().get(i).getSelect()==false) {
+                            if (b && mAdapter.getData().get(i).getSelect() == false) {
                                 mAdapter.getData().get(i).setSelect(true);
                                 mAdapter.notifyDataSetChanged();
                                 break;
                             }
                         }
                     }
+
                     @Override
                     public void onError(Throwable e) {
                     }
+
                     @Override
                     public void onComplete() {
                     }
@@ -233,10 +241,16 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
                 List<AssetsBean> addData = new ArrayList<>();
                 AssetsBean assetsBean = mList.get(position);
                 addData.add(assetsBean);
-                if (UsbUtils.getUsbType()) {
-                    InstructUtils.send( mList.get(position),taskBean.getCreateTime());
+//                if (UsbUtils.getUsbType()) {
+//                    InstructUtils.send(mList.get(position), taskBean.getCreateTime());
+//                } else {
+//                    RfidDataUtils.changeOffline(_mActivity, addData, taskBean.getTaskid());
+//                }
+
+                if (CommonUtils.isNetworkConnected()) {
+                    mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
                 } else {
-                    RfidDataUtils.changeOffline(_mActivity,addData,taskBean.getTaskid());
+                    RfidDataUtils.changeOffline(addData, taskBean.getTaskid());
                 }
             }
         });
@@ -264,62 +278,65 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
 
     }
 
-    @OnClick({R2.id.btn_finish,R2.id.btn_refuse, R2.id.btn_allow})
+    @OnClick({R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow})
     void onClick(View view) {
         int i = view.getId();
-         if (i == R.id.btn_finish) {
+        if (i == R.id.btn_finish) {
             ll_bottom.setVisibility(View.VISIBLE);
             btn_finish.setVisibility(View.GONE);
-
-            if (ChannelMap.getChannel("1") != null) {
-                Message message = new Message();
-                message.setId(1);
-                message.setType(MsgType.UPLOADDATA);
-                UpLoad upLoad = new UpLoad();
-                upLoad.setCreateTime(taskBean.getCreateTime());
-                upLoad.setAssetList(mList);
-                message.setResponseMessage(upLoad);
-                ChannelMap.getChannel("1").writeAndFlush(new TextWebSocketFrame(GsonUtil.GsonString(message)));
-            } else {
-                showToast("未连接");
-            }
-        }  else if (i == R.id.btn_refuse) {
+        } else if (i == R.id.btn_refuse) {
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择拒绝通行理由").setItemType(AppDialog.REFUSE).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
-                    Message message = new Message();
-                    message.setId(1);
-                    message.setType(MsgType.UPLOADDATA);
-                    UpLoad upLoad = new UpLoad();
-                    upLoad.setCreateTime(taskBean.getCreateTime());
-                    upLoad.setReason(val);
-                    upLoad.setPassFlag(1);
-                    upLoad.setAssetList(mList);
-                    message.setResponseMessage(upLoad);
-                    InstructUtils.send(message);
-
+//                    Message message = new Message();
+//                    message.setId(1);
+//                    message.setType(MsgType.UPLOADDATA);
+//                    UpLoad upLoad = new UpLoad();
+//                    upLoad.setCreateTime(taskBean.getCreateTime());
+//                    upLoad.setReason(val);
+//                    upLoad.setPassFlag(1);
+//                    upLoad.setAssetList(mList);
+//                    message.setResponseMessage(upLoad);
+//                    InstructUtils.send(message);
+                    passFlag = 1;
+                    reason = val;
+//                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(), val, mAdapter.getData()));
+                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));
                 }
             }).show();
-        }  else if (i == R.id.btn_allow) {
+        } else if (i == R.id.btn_allow) {
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择允许通行理由").setItemType(AppDialog.ALLOW).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
-                    Message message = new Message();
-                    message.setId(1);
-                    message.setType(MsgType.UPLOADDATA);
-                    UpLoad upLoad = new UpLoad();
-                    upLoad.setCreateTime(taskBean.getCreateTime());
-                    upLoad.setReason(val);
-                    upLoad.setPassFlag(0);
-                    upLoad.setAssetList(mList);
-                    message.setResponseMessage(upLoad);
-                    InstructUtils.send(message);
+//                    Message message = new Message();
+//                    message.setId(1);
+//                    message.setType(MsgType.UPLOADDATA);
+//                    UpLoad upLoad = new UpLoad();
+//                    upLoad.setCreateTime(taskBean.getCreateTime());
+//                    upLoad.setReason(val);
+//                    upLoad.setPassFlag(0);
+//                    upLoad.setAssetList(mList);
+//                    message.setResponseMessage(upLoad);
+//                    InstructUtils.send(message);
+                    passFlag = 0;
+                    reason = val;
+//                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(), val, mAdapter.getData()));
+                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));
                 }
             }).show();
         }
     }
 
-
+    //接受终端返回的数据
+    @Subscriber(tag = EventBusTags.SEARCH_RFID)
+    private void updateUser(Event event) {
+        //位于栈顶才接收
+        Log.e("SEARCH_RFID:", "SEARCH_RFID");
+        if (getTopFragment() instanceof CurrentInventoryDetailsFragment) {
+            List<AssetsBean> list = (List<AssetsBean>) event.getData();
+            ChangeData(list);
+        }
+    }
 
     //接受终端返回的数据
     @Subscriber(tag = EventBusTags.UPLOADDATA)
@@ -338,6 +355,7 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
             }
         }
     }
+
     //接受手持机扫描
     @Subscriber(tag = EventBusTags.SCANRFID)
     private void scaanRfid(Event event) {
@@ -355,25 +373,47 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
             //再插入数据
             new DbManager().insertAssetsBean(assetsBean);
             getDate();
+
             //判断是否离线，离线访问离线数据库，不是离线，访问请求
-            if (UsbUtils.getUsbType()) {
-                Message message = new Message();
-                message.setId(1);
-                message.setType(MsgType.RFID);
-                UpLoad upLoad = new UpLoad();
-                upLoad.setId("1");
-                upLoad.setDeviceId("");
-                upLoad.setCreateTime(taskBean.getCreateTime());
-                upLoad.setAssetList(addData);
-                message.setResponseMessage(upLoad);
-                InstructUtils.send(message);
+            //            if (UsbUtils.getUsbType()) {
+//                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
+//
+//            } else {
+//                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
+//                getDate();
+//            }
+            if (CommonUtils.isNetworkConnected()) {
+                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
             } else {
-                RfidDataUtils.changeOffline(_mActivity,addData,taskBean.getTaskid());
+                RfidDataUtils.changeOffline(addData, taskBean.getTaskid());
                 getDate();
             }
         }
     }
 
+    public void ChangeData(List<AssetsBean> list) {
+//查询数据库当前taskid 下的资产
+        for (int i = 0; i < list.size(); i++) {
+            //遍历返回的数据，查询数据库中是否含有改数据有则修改
+            AssetsBean assetsBean = new DbManager().queryAssetsBeanWhereTaskidAndRfid(taskBean.getTaskid(), list.get(i).getRfidId());
+            assetsBean.setAssetUser(list.get(i).getAssetUser());
+            assetsBean.setAssetIncId(list.get(i).getAssetIncId());
+            assetsBean.setBelongDept(list.get(i).getBelongDept());
+            assetsBean.setLastApproveUser(list.get(i).getLastApproveUser());
+            assetsBean.setId(list.get(i).getId());
+            assetsBean.setOutBillId(list.get(i).getOutBillId());
+            assetsBean.setAssetId(list.get(i).getAssetId());
+            assetsBean.setPermissionState(list.get(i).getPermissionState());
+            assetsBean.setAssetState(list.get(i).getAssetState());
+            assetsBean.setEndTime(list.get(i).getEndTime());
+            assetsBean.setAssetName(list.get(i).getAssetName());
+            assetsBean.setTypeId(list.get(i).getTypeId());
+            assetsBean.setAssetBrand(list.get(i).getAssetBrand());
+            assetsBean.setAssetModel(list.get(i).getAssetModel());
+            new DbManager().upAssetsBeanWhereId(assetsBean);
+        }
+        getDate();
+    }
 
     @Override
     public void onDestroy() {
@@ -393,4 +433,24 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
     }
 
 
+    //接口接收
+    @Override
+    public void receiveResult(ArrayList<AssetsBean> list) {
+        if (list.size() > 0) {
+            ChangeData(list);
+        }
+    }
+
+    @Override
+    public void upLoadResult() {
+        Toast.makeText(_mActivity, "提交成功", Toast.LENGTH_SHORT).show();
+//上传修改数据库任务状态   passFlag reason
+        taskBean.setPassFlag(passFlag);
+        taskBean.setReason(reason);
+        taskBean.setState(1);
+        taskBean.setNumber(mAdapter.getData().size());
+        new DbManager().upDateTaskBeanWhereId(taskBean.getId(), taskBean);
+//        new DbManager().upDateTaskBeanWhereId(taskBean.getId(), 1);
+        pop();
+    }
 }

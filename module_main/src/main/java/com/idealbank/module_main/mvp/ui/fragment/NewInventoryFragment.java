@@ -2,6 +2,7 @@ package com.idealbank.module_main.mvp.ui.fragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.idealbank.module_main.Netty.ChannelMap;
@@ -78,6 +80,9 @@ import me.jessyan.armscomponent.commonsdk.bean.Event;
 import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
 import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
 import me.jessyan.autosize.utils.LogUtils;
+import me.yokeyword.fragmentation.SupportActivity;
+
+import static me.jessyan.armscomponent.commonsdk.utils.ToastUtil.showToast;
 
 
 /**
@@ -102,7 +107,11 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
     @Inject
     List<AssetsBean> mList;
+    TaskBean taskBean;
     String taskid;
+    String reason;
+    int passFlag;
+
     String createTime;
     Boolean isopen = false;
     public ONDEVMESSAGE OnMsg = new ONDEVMESSAGE();
@@ -157,7 +166,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         createTime = DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL);
         tv_time.setText(createTime);
         //增加任务
-        TaskBean taskBean = new TaskBean();
+         taskBean = new TaskBean();
         taskBean.setState(0);
         taskBean.setTaskid(taskid);
         taskBean.setNumber(mAdapter.getData().size());
@@ -173,11 +182,9 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         MyApplication.sv_Main.gpio_rfid_config(true);
     }
 
-
     int a = 0;
-
-    //
-    @OnClick({R2.id.btn_add, R2.id.btn_edit, R2.id.btn_query, R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow})
+//    R2.id.btn_add, R2.id.btn_edit, R2.id.btn_query,
+    @OnClick({ R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow})
     void onViewClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_finish) {
@@ -188,16 +195,20 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
                 @Override
                 public void onClick(String val) {
+                    passFlag=1;
+                    reason=val;
 //                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean( createTime,val,mAdapter.getData()));
+                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
                 }
             }).show();
         } else if (id == R.id.btn_allow) {
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择允许通行理由").setItemType(AppDialog.ALLOW).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
+                    passFlag=0;
+                    reason=val;
 //                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean( createTime,val,mAdapter.getData()));
+                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
                 }
             }).show();
         } else if (id == R.id.btn_edit) {
@@ -219,54 +230,54 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                         }
                     })
                     .show();
-        } else if (id == R.id.btn_add) {
-            List<AssetsBean> addData = new ArrayList<>();
-            AssetsBean assetsBean = new AssetsBean(null, null, "100" + (a + 0), taskid, 0, "", "", "", "", "", "", "", "", "", "", "", 4, 0);
-            assetsBean.setTime(System.currentTimeMillis());
-            addData.add(assetsBean);
-            a = a + 1;
-            //再插入数据
-            new DbManager().insertInTxAssetsBean(addData);
-            getDate();
-            //判断是否离线，离线访问离线数据库，不是离线，访问请求
-
-//            if (UsbUtils.getUsbType()) {
-//                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
-//
-//            } else {
-//                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
-//                getDate();
-//            }
-
-            if(CommonUtils.isNetworkConnected()){
-                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
-            }else{
-                RfidDataUtils.changeOffline(addData,taskid);
-            }
-
-
-        } else if (id == R.id.btn_query) {
-            //模拟离线查询
-            if (UsbUtils.getUsbType()) {
-                List<AssetsBean> addData = new DbManager().queryAssetsBeanWhereTaskid(taskid);
-                for (int i = 0; i < addData.size(); i++) {
-                    AssetsBean assetsBean = addData.get(i);
-                    if (i == 0) {
-                        assetsBean.setPermissionState(0);
-                        assetsBean.setBelongDept("技术");
-                    } else if (i == 1) {
-                        assetsBean.setPermissionState(1);
-                        assetsBean.setBelongDept("香炉");
-                    } else if (i == 2) {
-                        assetsBean.setPermissionState(3);
-                        assetsBean.setBelongDept("智能");
-                    }
-                }
-                EventBusUtils.sendEvent(new Event(addData), EventBusTags.SEARCH_RFID);
-            } else {
-                InstructUtils.send(InstructUtils.getRFIDMessage(mList));
-            }
         }
+//        else if (id == R.id.btn_add) {
+//            List<AssetsBean> addData = new ArrayList<>();
+//            AssetsBean assetsBean = new AssetsBean(null, null, "100" + (a + 0), taskid, 0, "", "", "", "", "", "", "", "", "", "", "", 4, 0);
+//            assetsBean.setTime(System.currentTimeMillis());
+//            addData.add(assetsBean);
+//            a = a + 1;
+//            //再插入数据
+//            new DbManager().insertInTxAssetsBean(addData);
+//            getDate();
+//            //判断是否离线，离线访问离线数据库，不是离线，访问请求
+////            if (UsbUtils.getUsbType()) {
+////                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
+////
+////            } else {
+////                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
+////                getDate();
+////            }
+//
+//            if (CommonUtils.isNetworkConnected()) {
+//                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+//            } else {
+//                RfidDataUtils.changeOffline(addData, taskid);
+//            }
+//
+//
+//        } else if (id == R.id.btn_query) {
+//            //模拟离线查询
+//            if (UsbUtils.getUsbType()) {
+//                List<AssetsBean> addData = new DbManager().queryAssetsBeanWhereTaskid(taskid);
+//                for (int i = 0; i < addData.size(); i++) {
+//                    AssetsBean assetsBean = addData.get(i);
+//                    if (i == 0) {
+//                        assetsBean.setPermissionState(0);
+//                        assetsBean.setBelongDept("技术");
+//                    } else if (i == 1) {
+//                        assetsBean.setPermissionState(1);
+//                        assetsBean.setBelongDept("香炉");
+//                    } else if (i == 2) {
+//                        assetsBean.setPermissionState(3);
+//                        assetsBean.setBelongDept("智能");
+//                    }
+//                }
+//                EventBusUtils.sendEvent(new Event(addData), EventBusTags.SEARCH_RFID);
+//            } else {
+//                InstructUtils.send(InstructUtils.getRFIDMessage(mList));
+//            }
+//        }
 
 
     }
@@ -276,9 +287,6 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         mAdapter.replaceData(mList);
         tv_num.setText("共" + mAdapter.getData().size() + "件物品");
     }
-
-
-
 
 
     @Override
@@ -296,8 +304,17 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
     @Override
     public void upLoadResult() {
-
+        Toast.makeText(_mActivity, "提交成功", Toast.LENGTH_SHORT).show();
+//上传修改数据库任务状态   passFlag reason
+        taskBean.setPassFlag(passFlag);
+        taskBean.setReason(reason);
+        taskBean.setState(1);
+        taskBean.setNumber(mAdapter.getData().size());
+        new DbManager().upDateTaskBeanWhereId(taskBean.getId(),taskBean);
+        pop();
     }
+
+
 
     //接受终端返回的数据
     @Subscriber(tag = EventBusTags.SEARCH_RFID)
@@ -335,10 +352,10 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 //                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
 //                getDate();
 //            }
-            if(CommonUtils.isNetworkConnected()){
+            if (CommonUtils.isNetworkConnected()) {
                 mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
-            }else{
-                RfidDataUtils.changeOffline(addData,taskid);
+            } else {
+                RfidDataUtils.changeOffline(addData, taskid); getDate();
             }
 
         }
@@ -373,7 +390,6 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
      * 初始化RecyclerView
      */
     private void initRecyclerView() {
-//       
         ArmsUtils.configRecyclerView(mRecyclerView, new LinearLayoutManager(getActivity()));
         mRecyclerView.getItemAnimator().setChangeDuration(0);// 通过设置动画执行时间为0来解决闪烁问题
         mAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
@@ -390,7 +406,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                                 @Override
                                 public void onClick(String val) {
                                     new DbManager().delAssetsBeanWhereId(mList.get(position).getUid());
-                                    ToastUtil.showToast("删除成功");
+                                    showToast("删除成功");
                                     getDate();
                                 }
                             })
@@ -400,29 +416,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                 }
             }
         });
-        mAdapter.setListener(new NewInventoryAdapter.onItemClickListener() {
-            @Override
-            public void click(int position) {
-//判断是否离线，离线访问离线数据库，不是离线，访问请求
-                List<AssetsBean> addData = new ArrayList<>();
-                AssetsBean assetsBean = mList.get(position);
-                addData.add(assetsBean);
-                if (UsbUtils.getUsbType()) {
-                    Message message = new Message();
-                    message.setId(1);
-                    message.setType(MsgType.RFID);
-                    UpLoad upLoad = new UpLoad();
-                    upLoad.setId("1");
-                    upLoad.setDeviceId("");
-                    upLoad.setCreateTime(createTime);
-                    upLoad.setAssetList(addData);
-                    message.setResponseMessage(upLoad);
-                    InstructUtils.send(message);
-                } else {
-//                    changeOffline(addData);
-                }
-            }
-        });
+
         mAdapter.setOnItemChildLongClickListener(new BaseQuickAdapter.OnItemChildLongClickListener() {
             @Override
             public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
@@ -528,9 +522,12 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         //位于栈顶才接收
         if (getTopFragment() instanceof NewInventoryFragment) {
             if (event.getAction() == "1") {
-                ToastUtil.showToast(ToastUtil.TPYE_FAILURE, "上传成功");
+                showToast(ToastUtil.TPYE_FAILURE, "上传成功");
+                //上传修改数据库任务状态
+                new DbManager().upDateTaskBeanWhereId(taskBean.getId(), 1);
+
             } else {
-                ToastUtil.showToast(ToastUtil.TPYE_FAILURE, "上传失败");
+                showToast(ToastUtil.TPYE_FAILURE, "上传失败");
             }
         }
     }

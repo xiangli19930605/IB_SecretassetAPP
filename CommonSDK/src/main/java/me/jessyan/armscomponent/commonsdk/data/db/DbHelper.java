@@ -29,6 +29,12 @@ public interface DbHelper {
 
     //根据状态查询任务
     List<TaskBean> queryTaskBeanWhereState(int state);
+    //根据id 查询TaskBean
+    TaskBean getTaskBeanWhereSWhereId(Long data);
+
+    //更新任务状态
+    void upDateTaskBeanWhereId(Long data, TaskBean taskBean);
+
 
     //更新任务状态
     void upDateTaskBeanWhereId(Long data, int state);
@@ -36,6 +42,11 @@ public interface DbHelper {
 //    //更新任务的数量
     void upDateNumberTaskBeanWhereId(String data, int number);
 //
+
+
+
+
+
 
 
     //增加单个资产

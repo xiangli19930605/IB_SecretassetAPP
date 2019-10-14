@@ -23,16 +23,19 @@
                 android:orientation="vertical">
 
                 <com.allen.library.SuperTextView
+                    android:id="@+id/stv_taskid"
                     style="@style/TextView_commom"
                     stv:sCenterTextString="12312"
                     stv:sLeftTextString="RFID编号：" />
 
                 <com.allen.library.SuperTextView
+                    android:id="@+id/stv_createTime"
                     style="@style/TextView_commom"
                     stv:sCenterTextString="2019-3-4"
                     stv:sLeftTextString="盘查时间：" />
 
                 <com.allen.library.SuperTextView
+                    android:id="@+id/stv_num"
                     style="@style/TextView_commom"
                     stv:sCenterTextString="4"
                     stv:sLeftTextString="物品件数：" />

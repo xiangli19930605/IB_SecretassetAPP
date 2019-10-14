@@ -16,7 +16,10 @@
 package com.idealbank.module_main.mvp.ui.adapter;
 
 import android.support.annotation.Nullable;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.allen.library.SuperTextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.idealbank.module_main.R;
@@ -49,6 +52,21 @@ public class HistoryAssetsAdapter extends BaseQuickAdapter<AssetsBean, BaseViewH
     protected void convert(BaseViewHolder helper, AssetsBean data) {
 
 
+        if (data.getPermissionState() == 0) {
+            ((TextView) helper.getView(R.id.tv_state)).setText("已授权");
+            ((ImageView) helper.getView(R.id.img_state)).setImageResource(R.mipmap.ic_yes_big);
+        } else if (data.getPermissionState() == 1) {
+            ((TextView) helper.getView(R.id.tv_state)).setText("未授权");
+            ((ImageView) helper.getView(R.id.img_state)).setImageResource(R.mipmap.ic_no_big);
+        } else {
+//                ((TextView) helper.getView(R.id.tv_state)).setText("临时授权");
+            ((TextView) helper.getView(R.id.tv_state)).setText("查无此物");
+            ((ImageView) helper.getView(R.id.img_state)).setImageResource(R.mipmap.ic_warn_big);
+        }
+
+        ((SuperTextView) helper.getView(R.id.tv_id)).setCenterString(data.getRfidId());
+        ((SuperTextView) helper.getView(R.id.stv_assetUser)).setCenterString(data.getAssetUser());
+        ((SuperTextView) helper.getView(R.id.stv_belongDept)).setCenterString(data.getBelongDept());
         }
 
 

@@ -105,7 +105,7 @@ public class InstructUtils {
         return upAssetsBean;
     }
     //接口上传记录时   获取类
-    public static UpLoadAssetsBean getUpLoadAssetsBean(String  createTime,String reason,List<AssetsBean> mList) {
+    public static UpLoadAssetsBean getUpLoadAssetsBean(String  taskid,String  createTime,String reason,List<AssetsBean> mList) {
         Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
         if (location == null) {
             LogUtils.e(location.getSpaceName());
@@ -120,6 +120,7 @@ public class InstructUtils {
         upLoad.setReason(reason);
         upLoad.setPassFlag(1);
         upLoad.setAssetList(mList);
+        upLoad.setTaskId(taskid);
         dataBean.setResponseMessage(upLoad);
         upLoadAssetsBean.setData(dataBean);
         return upLoadAssetsBean;

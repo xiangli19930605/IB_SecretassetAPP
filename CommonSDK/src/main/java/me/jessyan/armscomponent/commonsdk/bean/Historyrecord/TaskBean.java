@@ -20,17 +20,20 @@ public class TaskBean implements Serializable {
     private String      createTime;   //创建时间
     private String     finishTime;   //创建时间
     private int      number;   //件数
+    private int passFlag;   //0允许，1拒绝
+    private String reason;   //理由
 
-
-    @Generated(hash = 1968067391)
+    @Generated(hash = 1818773099)
     public TaskBean(Long id, String taskid, int state, String createTime,
-            String finishTime, int number) {
+            String finishTime, int number, int passFlag, String reason) {
         this.id = id;
         this.taskid = taskid;
         this.state = state;
         this.createTime = createTime;
         this.finishTime = finishTime;
         this.number = number;
+        this.passFlag = passFlag;
+        this.reason = reason;
     }
     @Generated(hash = 1443476586)
     public TaskBean() {
@@ -70,6 +73,18 @@ public class TaskBean implements Serializable {
     }
     public void setNumber(int number) {
         this.number = number;
+    }
+    public int getPassFlag() {
+        return this.passFlag;
+    }
+    public void setPassFlag(int passFlag) {
+        this.passFlag = passFlag;
+    }
+    public String getReason() {
+        return this.reason;
+    }
+    public void setReason(String reason) {
+        this.reason = reason;
     }
    
 

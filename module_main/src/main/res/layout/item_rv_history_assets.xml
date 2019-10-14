@@ -16,12 +16,14 @@
         android:padding="@dimen/dp_30">
 
         <ImageView
+            android:id="@+id/img_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@mipmap/ic_yes_big" />
 
         <TextView
+            android:id="@+id/tv_state"
             android:gravity="center"
             android:layout_width="@dimen/dp_70"
             android:layout_height="wrap_content"
@@ -38,23 +40,23 @@
             android:orientation="vertical">
 
             <com.allen.library.SuperTextView
+                android:id="@+id/tv_id"
                 style="@style/TextView_commom"
                 stv:sCenterTextString="2121"
                 stv:sLeftTextString="RFID编号：" />
 
-            <com.allen.library.SuperTextView
-                style="@style/TextView_commom"
-                stv:sCenterTextString="允许通行"
-                stv:sLeftTextString="物品名称：" />
+
 
             <com.allen.library.SuperTextView
+                android:id="@+id/stv_belongDept"
                 style="@style/TextView_commom"
-                stv:sCenterTextString="允许通行"
+                stv:sCenterTextString=""
                 stv:sLeftTextString="所属部门：" />
 
             <com.allen.library.SuperTextView
+                android:id="@+id/stv_assetUser"
                 style="@style/TextView_commom"
-                stv:sCenterTextString="允许通行"
+                stv:sCenterTextString=""
                 stv:sLeftTextString="当前责任人：" />
 
         </LinearLayout>
