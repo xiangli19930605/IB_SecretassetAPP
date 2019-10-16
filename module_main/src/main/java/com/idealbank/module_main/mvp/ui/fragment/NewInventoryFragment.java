@@ -44,6 +44,7 @@ import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
 import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.app.rfid_module.ONDEVMESSAGE;
 import com.idealbank.module_main.app.rfid_module.RfidData;
+import com.idealbank.module_main.app.service.NetWorkReceiver;
 import com.idealbank.module_main.app.utils.RfidDataUtils;
 import com.idealbank.module_main.app.utils.UsbUtils;
 import com.idealbank.module_main.bean.Location;
@@ -191,46 +192,60 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
             ll_bottom.setVisibility(View.VISIBLE);
             btn_finish.setVisibility(View.GONE);
         } else if (id == R.id.btn_refuse) {
+            if (mAdapter.getData().size() == 0) {
+                ArmsUtils.snackbarText("请添加资产再提交");
+                return ;
+            }
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择拒绝通行理由").setItemType(AppDialog.REFUSE).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
-
                 @Override
                 public void onClick(String val) {
                     passFlag=1;
                     reason=val;
+                    if (Constants.ISNETORSOCKET) {
 //                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
+                    }else{
+                        mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
+                    }
                 }
             }).show();
         } else if (id == R.id.btn_allow) {
+            if (mAdapter.getData().size() == 0) {
+                ArmsUtils.snackbarText("请添加资产再提交");
+                return ;
+            }
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择允许通行理由").setItemType(AppDialog.ALLOW).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
                     passFlag=0;
                     reason=val;
-//                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
+                    if (Constants.ISNETORSOCKET) {
+//                      InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
+                    }else {
+                        mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
+                    }
                 }
             }).show();
-        } else if (id == R.id.btn_edit) {
-            new AppDialog(getContext(), DialogType.INPUT)
-                    .setTitle("修改项")
-                    .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
-                        @Override
-                        public void onClick(String val) {
-                        }
-                    })
-                    .setRightButton("确定", new AppDialog.OnButtonClickListener() {
-                        @Override
-                        public void onClick(String val) {
-                            if (val != null && !val.equals("")) {
-                                AssetsBean assets = mList.get(Integer.valueOf(val));
-                                assets.setPermissionState(1);
-                                mAdapter.setData(Integer.valueOf(val), assets);
-                            }
-                        }
-                    })
-                    .show();
         }
+//        else if (id == R.id.btn_edit) {
+//            new AppDialog(getContext(), DialogType.INPUT)
+//                    .setTitle("修改项")
+//                    .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+//                        @Override
+//                        public void onClick(String val) {
+//                        }
+//                    })
+//                    .setRightButton("确定", new AppDialog.OnButtonClickListener() {
+//                        @Override
+//                        public void onClick(String val) {
+//                            if (val != null && !val.equals("")) {
+//                                AssetsBean assets = mList.get(Integer.valueOf(val));
+//                                assets.setPermissionState(1);
+//                                mAdapter.setData(Integer.valueOf(val), assets);
+//                            }
+//                        }
+//                    })
+//                    .show();
+//        }
 //        else if (id == R.id.btn_add) {
 //            List<AssetsBean> addData = new ArrayList<>();
 //            AssetsBean assetsBean = new AssetsBean(null, null, "100" + (a + 0), taskid, 0, "", "", "", "", "", "", "", "", "", "", "", 4, 0);
@@ -294,72 +309,8 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
     }
 
-    //接口接收
-    @Override
-    public void receiveResult(ArrayList<AssetsBean> list) {
-        if (list.size() > 0) {
-            ChangeData(list);
-        }
-    }
-
-    @Override
-    public void upLoadResult() {
-        Toast.makeText(_mActivity, "提交成功", Toast.LENGTH_SHORT).show();
-//上传修改数据库任务状态   passFlag reason
-        taskBean.setPassFlag(passFlag);
-        taskBean.setReason(reason);
-        taskBean.setState(1);
-        taskBean.setNumber(mAdapter.getData().size());
-        new DbManager().upDateTaskBeanWhereId(taskBean.getId(),taskBean);
-        pop();
-    }
 
 
-
-    //接受终端返回的数据
-    @Subscriber(tag = EventBusTags.SEARCH_RFID)
-    private void updateUser(Event event) {
-        //位于栈顶才接收
-        Log.e("SEARCH_RFID:", "SEARCH_RFID");
-        if (getTopFragment() instanceof NewInventoryFragment) {
-            List<AssetsBean> list = (List<AssetsBean>) event.getData();
-            ChangeData(list);
-        }
-    }
-
-    //接受手持机扫描  RFID
-    @Subscriber(tag = EventBusTags.SCANRFID)
-    private void scaanRfid(Event event) {
-        //位于栈顶才接收
-        Log.e("SCANRFID:", "SCANRFID");
-        if (getTopFragment() instanceof NewInventoryFragment) {
-            List<AssetsBean> addData = new ArrayList<>();
-            RfidData rfidData = (RfidData) event.getData();
-            AssetsBean assetsBean = new AssetsBean(null, null, rfidData.getTagid(), taskid, rfidData.getTagType(), "", "", "", "", "", "", DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL), "", "", "", "", 4, 0);
-            assetsBean.setTime(System.currentTimeMillis());
-            addData.add(assetsBean);
-            if (new DbManager().queryAssetsBeanWhereTaskidAndRfid(taskid, rfidData.getTagid()) != null) {
-                return;
-            }
-            //再插入数据
-            new DbManager().insertAssetsBean(assetsBean);
-            getDate();
-            //判断是否离线，离线访问离线数据库，不是离线，访问请求
-            //            if (UsbUtils.getUsbType()) {
-//                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
-//
-//            } else {
-//                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
-//                getDate();
-//            }
-            if (CommonUtils.isNetworkConnected()) {
-                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
-            } else {
-                RfidDataUtils.changeOffline(addData, taskid); getDate();
-            }
-
-        }
-    }
 
 
     public void ChangeData(List<AssetsBean> list) {
@@ -524,13 +475,98 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
             if (event.getAction() == "1") {
                 showToast(ToastUtil.TPYE_FAILURE, "上传成功");
                 //上传修改数据库任务状态
-                new DbManager().upDateTaskBeanWhereId(taskBean.getId(), 1);
-
+                taskBean.setPassFlag(passFlag);
+                taskBean.setReason(reason);
+                taskBean.setState(1);
+                taskBean.setNumber(mAdapter.getData().size());
+                new DbManager().upDateTaskBeanWhereId(taskBean.getId(),taskBean);
+                EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_HIS);
             } else {
                 showToast(ToastUtil.TPYE_FAILURE, "上传失败");
             }
         }
     }
+    //接口接收
+    @Override
+    public void receiveResult(ArrayList<AssetsBean> list) {
+        if (list.size() > 0) {
+            ChangeData(list);
+        }
+    }
 
+    @Override
+    public void upLoadResult() {
+        Toast.makeText(_mActivity, "提交成功", Toast.LENGTH_SHORT).show();
+//上传修改数据库任务状态   passFlag reason
+        taskBean.setPassFlag(passFlag);
+        taskBean.setReason(reason);
+        taskBean.setState(1);
+        taskBean.setNumber(mAdapter.getData().size());
+        new DbManager().upDateTaskBeanWhereId(taskBean.getId(),taskBean);
+        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_HIS);
+        pop();
+    }
 
+    //接受终端返回的数据
+    @Subscriber(tag = EventBusTags.SEARCH_RFID)
+    private void updateUser(Event event) {
+        //位于栈顶才接收
+        Log.e("SEARCH_RFID:", "SEARCH_RFID");
+        if (getTopFragment() instanceof NewInventoryFragment) {
+            List<AssetsBean> list = (List<AssetsBean>) event.getData();
+            ChangeData(list);
+        }
+    }
+
+    //接受手持机扫描  RFID
+    @Subscriber(tag = EventBusTags.SCANRFID)
+    private void scaanRfid(Event event) {
+        //位于栈顶才接收
+        Log.e("SCANRFID:", "SCANRFID");
+        if (getTopFragment() instanceof NewInventoryFragment) {
+            List<AssetsBean> addData = new ArrayList<>();
+            RfidData rfidData = (RfidData) event.getData();
+            AssetsBean assetsBean = new AssetsBean(null, null, rfidData.getTagid(), taskid, rfidData.getTagType(), "", "", "", "", "", "", DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL), "", "", "", "", 4, 0);
+            assetsBean.setTime(System.currentTimeMillis());
+            addData.add(assetsBean);
+            if (new DbManager().queryAssetsBeanWhereTaskidAndRfid(taskid, rfidData.getTagid()) != null) {
+                return;
+            }
+            //再插入数据
+            new DbManager().insertAssetsBean(assetsBean);
+            getDate();
+            //判断是否离线，离线访问离线数据库，不是离线，访问请求
+            //            if (UsbUtils.getUsbType()) {
+//                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
+//
+//            } else {
+//                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
+//                getDate();
+//            }
+            if (CommonUtils.isNetworkConnected()) {
+                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+            } else {
+                RfidDataUtils.changeOffline(addData, taskid);
+                getDate();
+            }
+
+        }
+    }
+
+    //网络
+    @Subscriber(tag = EventBusTags.NETWORKCHANGE)
+    private void networkchange(Event event) {
+        //位于栈顶才接收
+        if (getTopFragment() instanceof NewInventoryFragment) {
+                    if(event.getAction().equals("NOCONNECT" )){
+                        new AppDialog(_mActivity)
+                                .setTitle("提示")
+                                .setContent("以太网连接断开，将进行离线模式")
+                                .setSingleButton()
+                                .show();
+                    }else if(event.getAction().equals("NET_ETHERNET" )){
+                        ToastUtil.showToast("已连接以太网");
+                    }
+        }
+    }
 }

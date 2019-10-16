@@ -46,7 +46,11 @@ public interface Constants {
 
     public static final String NIGHT_MODE_STATE = "night_mode_state";
     public static final String LOCATION = "location";
+    public static final String IP = "IP";
+    public static final String PORT = "PORT";
     public static final String USB_STATE = "usb_state";
+
+
 
 
 }

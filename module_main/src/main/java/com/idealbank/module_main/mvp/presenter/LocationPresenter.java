@@ -2,6 +2,7 @@ package com.idealbank.module_main.mvp.presenter;
 
 import android.app.Application;
 
+import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.bean.Location;
 import com.idealbank.module_main.bean.LoginBeanRequest;
 import com.jess.arms.integration.AppManager;
@@ -58,10 +59,10 @@ public class LocationPresenter extends BasePresenter<LocationContract.Model, Loc
     }
 
     public void getLocationList() {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.getLocationList()
                 .subscribeOn(Schedulers.io())
-                .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
+                .retryWhen(new RetryWithDelay(2, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
                 .doOnSubscribe(disposable -> {
                     mRootView.showLoading();//显示下拉刷新的进度条
                 }).subscribeOn(AndroidSchedulers.mainThread())
@@ -78,7 +79,7 @@ public class LocationPresenter extends BasePresenter<LocationContract.Model, Loc
                 });
     }
     public void login(LoginBeanRequest loginBeanRequest) {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.login(loginBeanRequest)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔

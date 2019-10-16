@@ -285,43 +285,35 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
             ll_bottom.setVisibility(View.VISIBLE);
             btn_finish.setVisibility(View.GONE);
         } else if (i == R.id.btn_refuse) {
+            if (mAdapter.getData().size() == 0) {
+                ArmsUtils.snackbarText("请添加资产再提交");
+                return ;
+            }
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择拒绝通行理由").setItemType(AppDialog.REFUSE).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
-//                    Message message = new Message();
-//                    message.setId(1);
-//                    message.setType(MsgType.UPLOADDATA);
-//                    UpLoad upLoad = new UpLoad();
-//                    upLoad.setCreateTime(taskBean.getCreateTime());
-//                    upLoad.setReason(val);
-//                    upLoad.setPassFlag(1);
-//                    upLoad.setAssetList(mList);
-//                    message.setResponseMessage(upLoad);
-//                    InstructUtils.send(message);
                     passFlag = 1;
                     reason = val;
-//                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(), val, mAdapter.getData()));
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));
+                    if (Constants.ISNETORSOCKET) {
+//                      InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
+                    }else {
+                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));}
                 }
             }).show();
         } else if (i == R.id.btn_allow) {
+            if (mAdapter.getData().size() == 0) {
+                ArmsUtils.snackbarText("请添加资产再提交");
+                return ;
+            }
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择允许通行理由").setItemType(AppDialog.ALLOW).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
-//                    Message message = new Message();
-//                    message.setId(1);
-//                    message.setType(MsgType.UPLOADDATA);
-//                    UpLoad upLoad = new UpLoad();
-//                    upLoad.setCreateTime(taskBean.getCreateTime());
-//                    upLoad.setReason(val);
-//                    upLoad.setPassFlag(0);
-//                    upLoad.setAssetList(mList);
-//                    message.setResponseMessage(upLoad);
-//                    InstructUtils.send(message);
                     passFlag = 0;
                     reason = val;
+                    if (Constants.ISNETORSOCKET) {
 //                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(), val, mAdapter.getData()));
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));
+                    }else {
+                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));}
                 }
             }).show();
         }
@@ -345,8 +337,12 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
         if (getTopFragment() instanceof CurrentInventoryDetailsFragment) {
             if (event.getAction() == "1") {
                 ToastUtil.showToast(ToastUtil.TPYE_FAILURE, "上传成功");
-                //上传修改数据库任务状态
-                new DbManager().upDateTaskBeanWhereId(taskBean.getId(), 1);
+               //上传修改数据库任务状态   passFlag reason
+                taskBean.setPassFlag(passFlag);
+                taskBean.setReason(reason);
+                taskBean.setState(1);
+                taskBean.setNumber(mAdapter.getData().size());
+                new DbManager().upDateTaskBeanWhereId(taskBean.getId(), taskBean);
                 EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
                 EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_HIS);
                 pop();
@@ -450,7 +446,25 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
         taskBean.setState(1);
         taskBean.setNumber(mAdapter.getData().size());
         new DbManager().upDateTaskBeanWhereId(taskBean.getId(), taskBean);
+        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
+        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_HIS);
 //        new DbManager().upDateTaskBeanWhereId(taskBean.getId(), 1);
         pop();
+    }
+    //网络
+    @Subscriber(tag = EventBusTags.NETWORKCHANGE)
+    private void networkchange(Event event) {
+        //位于栈顶才接收
+        if (getTopFragment() instanceof NewInventoryFragment) {
+            if(event.getAction().equals("NOCONNECT" )){
+                new AppDialog(_mActivity)
+                        .setTitle("提示")
+                        .setContent("以太网连接断开，将进行离线模式")
+                        .setSingleButton()
+                        .show();
+            }else if(event.getAction().equals("NET_ETHERNET" )){
+                ToastUtil.showToast("已连接以太网");
+            }
+        }
     }
 }

@@ -19,8 +19,8 @@ public class RfidDataUtils {
     //处理离线
     public static Boolean changeOffline(Context content, List<AssetsBean> list, String taskid) {
         //先判断是否选择过离线模式   (两种情况  1 socket 2 )
-//        if (!UsbUtils.getUsbType() && !new DbManager().getUsbState()) {
-        if (!CommonUtils.isNetworkConnected()) {
+        if (!UsbUtils.getUsbType() && !new DbManager().getUsbState()) {
+//        if (!CommonUtils.isNetworkConnected()) {
             new AppDialog(content)
                     .setTitle("提示")
                     .setContent("链接断开，将进行离线模式")

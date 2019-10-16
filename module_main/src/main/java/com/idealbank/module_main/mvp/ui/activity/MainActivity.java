@@ -3,6 +3,7 @@ package com.idealbank.module_main.mvp.ui.activity;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.idealbank.module_main.Netty.ServiceUtils;
 import com.idealbank.module_main.app.DbManager;
+import com.idealbank.module_main.app.service.NetWorkReceiver;
 import com.idealbank.module_main.app.service.TestOneService;
 import com.idealbank.module_main.mvp.ui.fragment.MainFragment;
 import com.jess.arms.di.component.AppComponent;
@@ -40,6 +42,7 @@ import me.jessyan.armscomponent.commonres.dialog.LoadingDialog;
 import me.jessyan.armscomponent.commonsdk.base.activity.BaseActivity;
 import me.jessyan.armscomponent.commonsdk.bean.Event;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
+import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
 import me.jessyan.armscomponent.commonsdk.core.RouterHub;
 import me.jessyan.armscomponent.commonsdk.utils.EventBusUtils;
@@ -66,7 +69,7 @@ import static com.jess.arms.utils.Preconditions.checkNotNull;
  */
 @Route(path = RouterHub.MAIN_MAINEACTIVITY)
 public class MainActivity extends BaseActivity<MainPresenter> implements MainContract.View {
-
+    NetWorkReceiver receiver;
     @Override
     public void setupActivityComponent(@NonNull AppComponent appComponent) {
         DaggerMainComponent //如找不到该类,请编译一下项目
@@ -81,67 +84,77 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     public int initView(@Nullable Bundle savedInstanceState) {
         return R.layout.activity_main; //如果你不需要框架帮你设置 setContentView(id) 需要自行设置,请返回 0
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+            receiver = null;
+        }
     }
+
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
         if (findFragment(MainFragment.class) == null) {
-
             loadRootFragment(R.id.fl_container, MainFragment.newInstance());
-            String page=  getIntent().getStringExtra(EventBusTags.JUMP_PAGE);
-            if(page!=null&&page.endsWith(EventBusTags.THREE)){
+            String page = getIntent().getStringExtra(EventBusTags.JUMP_PAGE);
+            if (page != null && page.endsWith(EventBusTags.THREE)) {
                 EventBusUtils.sendEvent(new Event(EventBusTags.THREE), EventBusTags.JUMP_PAGE);
             }
         }
 
         PermissionUtil.requestPermission(new PermissionUtil.RequestPermission() {
-            @Override
-            public void onRequestPermissionSuccess() {
+                                             @Override
+                                             public void onRequestPermissionSuccess() {
 //                ToastUtil.showToast( "tongyi");
+                                             }
+
+                                             @Override
+                                             public void onRequestPermissionFailure(List<String> permissions) {
+                                                 ToastUtil.showToast("拒绝权限，等待下次询问哦");
+                                                 new AppDialog(MainActivity.this, DialogType.DEFAULT).setTitle("权限申请").setContent("在设置-应用-微信-权限中开启，以正常使用功能")
+                                                         .setLeftButton(new AppDialog.OnButtonClickListener() {
+                                                             @Override
+                                                             public void onClick(String val) {
+                                                                 finish();
+                                                             }
+                                                         }).setRightButton(new AppDialog.OnButtonClickListener() {
+                                                     @Override
+                                                     public void onClick(String val) {
+                                                         getOverlayPermission();
+                                                     }
+                                                 }).show();
+                                             }
+
+                                             @Override
+                                             public void onRequestPermissionFailureWithAskNeverAgain(List<String> permissions) {
+                                                 ToastUtil.showToast("拒绝权限，不再弹出询问框，请前往APP应用设置中打开此权限");
+                                             }
+                                         }, new RxPermissions(this), mErrorHandler, Manifest.permission.CAMERA,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (Constants.ISNETORSOCKET) {
+            if (ServiceUtils.isServiceRunning(this, "com.idealbank.module_main.app.service.TestOneService")) {
+                ToastUtil.showToast("服务已开启");
+            } else {
+                Intent intentFive = new Intent(this, TestOneService.class);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intentFive);
+                } else {
+                    startService(intentFive);
+                }
             }
+        }
 
-            @Override
-            public void onRequestPermissionFailure(List<String> permissions) {
-                ToastUtil.showToast("拒绝权限，等待下次询问哦");
-                new AppDialog(MainActivity.this, DialogType.DEFAULT).setTitle("权限申请").setContent("在设置-应用-微信-权限中开启，以正常使用功能")
-                        .setLeftButton(new AppDialog.OnButtonClickListener() {
-                            @Override
-                            public void onClick(String val) {
-                                finish();
-                            }
-                        }).setRightButton(new AppDialog.OnButtonClickListener() {
-                    @Override
-                    public void onClick(String val) {
-                        getOverlayPermission();
-                    }
-                }).show();
-            }
-
-            @Override
-            public void onRequestPermissionFailureWithAskNeverAgain(List<String> permissions) {
-                ToastUtil.showToast( "拒绝权限，不再弹出询问框，请前往APP应用设置中打开此权限");
-            }
-        },new RxPermissions(this),mErrorHandler,  Manifest.permission.CAMERA  ,
-                Manifest.permission.READ_PHONE_STATE  ,
-                Manifest.permission.READ_EXTERNAL_STORAGE ,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE );
-
-
-//        if (ServiceUtils.isServiceRunning(this, "com.idealbank.module_main.app.service.TestOneService")) {
-//            ToastUtil.showToast("服务已开启");
-//        } else {
-//            Intent intentFive = new Intent(this, TestOneService.class);
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//               startForegroundService(intentFive);
-//            } else {
-//                startService(intentFive);
-//            }
-//        }
-
-
+         receiver = new NetWorkReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, intentFilter);
     }
+
     @Inject
     RxErrorHandler mErrorHandler;
     // 再点一次退出程序时间设置
@@ -182,11 +195,13 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         startActivityForResult(intent, 0);
         finish();
     }
+
     @Override
     public FragmentAnimator onCreateFragmentAnimator() {
         // 设置横向(和安卓4.x动画相同)
         return new DefaultHorizontalAnimator();
     }
+
     @Override
     public void showLoading() {
 
@@ -215,11 +230,11 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     }
 
     protected LoadingDialog loadingDialog;
+
     //实时接收离线数据
     @Subscriber(tag = EventBusTags.OFFLINE)
     private void getOffline(Event event) {
         loadingDialog = new LoadingDialog(this);
-
         if (loadingDialog != null && !loadingDialog.isShowing()) {
             loadingDialog.setTitleText("下载离线数据中.....").show();
         }
@@ -228,10 +243,10 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
             List<OffLineAssetsBean> offList = (List<OffLineAssetsBean>) event.getData();
             new DbManager().insertInTxOffLineAssetsBean(offList);
             dismissLoading();
-        }catch (ClassCastException e){}
-
-
+        } catch (ClassCastException e) {
+        }
     }
+
     public void dismissLoading() {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();

@@ -191,6 +191,8 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
 
     @Override
     public void getLocation(ArrayList<Location> list) {
+        if(list.size()==0){
+        }
         myAdapter.replaceData(list);
     }
 

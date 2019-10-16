@@ -2,7 +2,6 @@ package com.idealbank.module_main.mvp.ui.fragment;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,17 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import com.idealbank.module_main.R2;
 import com.idealbank.module_main.app.DbManager;
+import com.idealbank.module_main.app.service.NetWorkReceiver;
 import com.idealbank.module_main.app.utils.Intents;
-import com.idealbank.module_main.bean.Location;
-import com.idealbank.module_main.bean.OfflineBeanRequest;
 import com.idealbank.module_main.mvp.ui.activity.MainActivity;
 import com.idealbank.module_main.mvp.ui.activity.TcpLinkActivity;
 import com.jess.arms.di.component.AppComponent;
-import com.jess.arms.utils.ArmsUtils;
 
 import com.idealbank.module_main.di.component.DaggerForthComponent;
 import com.idealbank.module_main.mvp.contract.ForthContract;
@@ -30,25 +26,17 @@ import com.idealbank.module_main.mvp.presenter.ForthPresenter;
 
 import com.idealbank.module_main.R;
 
-import org.simple.eventbus.Subscriber;
-
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import me.jessyan.armscomponent.commonres.dialog.LoadingDialog;
 import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
-import me.jessyan.armscomponent.commonsdk.bean.Event;
-import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
 import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
-import me.jessyan.armscomponent.commonsdk.core.RouterHub;
-import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
+import me.jessyan.armscomponent.commonsdk.utils.CommonUtils;
 import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
-import me.jessyan.armscomponent.commonsdk.utils.Utils;
-import me.jessyan.autosize.utils.LogUtils;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
 
@@ -109,6 +97,7 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
 
     }
 
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         int i = buttonView.getId();
@@ -135,6 +124,8 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
         } else if (i == R.id.btn_location) {
             ((MainFragment) getParentFragment()).startBrotherFragment(LocationFragment.newInstance());
         } else if (i == R.id.btn_offline) {
+            ((MainFragment) getParentFragment()).startBrotherFragment(OfflineDataFragment.newInstance());
+            //模拟数据
 //            new DbManager().clearOffLineAssetsBean();
 //            ArrayList<OffLineAssetsBean> list=new ArrayList();
 //            for (int j = 0; j < 10; j++) {
@@ -149,23 +140,21 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
 //                LogUtils.warnInfo(list2.get(j).getRfidId());
 //            }
 
-            Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
-
-            if (location != null) {
-                OfflineBeanRequest offlineBeanRequest=new OfflineBeanRequest();
-                offlineBeanRequest.setDeviceId(location.getId());
-                offlineBeanRequest.setRfidId("");
-
-                mPresenter.getOffLinePermissionList(offlineBeanRequest);
-            }else{
-                ((MainFragment) getParentFragment()).startBrotherFragment(LocationFragment.newInstance());
-            }
-
-            if (loadingDialog != null && !loadingDialog.isShowing()) {
-                loadingDialog.setTitleText("请求离线数据").show();
-            } else {
-                loadingDialog.show();
-            }
+//            Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
+//            if (location != null) {
+//                OfflineBeanRequest offlineBeanRequest=new OfflineBeanRequest();
+//                offlineBeanRequest.setDeviceId(location.getId());
+//                offlineBeanRequest.setRfidId("");
+//                mPresenter.getOffLinePermissionList(offlineBeanRequest);
+//            }else{
+//                ((MainFragment) getParentFragment()).startBrotherFragment(LocationFragment.newInstance());
+//            }
+//
+//            if (loadingDialog != null && !loadingDialog.isShowing()) {
+//                loadingDialog.setTitleText("请求离线数据").show();
+//            } else {
+//                loadingDialog.show();
+//            }
         }
     }
 

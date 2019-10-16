@@ -67,7 +67,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             stv:sDividerLineType="both"
-            stv:sLeftTextString="测试获取离线数据"
+            stv:sLeftTextString="获取离线数据"
             stv:sRightIconRes="@mipmap/arrow_right_red" />
         <com.allen.library.SuperTextView
             android:id="@+id/btn_location"

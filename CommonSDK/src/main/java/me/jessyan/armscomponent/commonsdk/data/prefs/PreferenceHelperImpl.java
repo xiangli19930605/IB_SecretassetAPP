@@ -61,4 +61,24 @@ public class PreferenceHelperImpl implements PreferenceHelper {
     public boolean getUsbState() {
         return mPreferences.getBoolean(Constants.USB_STATE, false);
     }
+
+    @Override
+    public void setIp(String ip) {
+        mPreferences.edit().putString(Constants.IP, ip).apply();
+    }
+
+    @Override
+    public String getIp() {
+        return mPreferences.getString(Constants.IP, "");
+    }
+
+    @Override
+    public void setPort(String port) {
+        mPreferences.edit().putString(Constants.PORT, port).apply();
+    }
+
+    @Override
+    public String getPort() {
+        return mPreferences.getString(Constants.PORT, "");
+    }
 }

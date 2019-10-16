@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.idealbank.module_main.R2;
+import com.idealbank.module_main.app.DbManager;
+import com.idealbank.module_main.bean.LoginBeanRequest;
 import com.idealbank.module_main.mvp.model.api.Api;
 import com.jess.arms.di.component.AppComponent;
 import com.jess.arms.utils.ArmsUtils;
@@ -30,6 +32,7 @@ import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseActionBarFragment;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
 import me.jessyan.armscomponent.commonsdk.constants.Constants;
+import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
 import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
@@ -79,21 +82,32 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
     public void initData(@Nullable Bundle savedInstanceState) {
 
         setTitleText("服务器IP设置");
-        mEdtIP.setText(Constants.IP);
-        mEdtPort.setText(Constants.PORT);
-
-
+        mEdtIP.setText( new DbManager().getIp()==""?Constants.IP:new DbManager().getIp());
+        mEdtPort.setText( new DbManager().getPort()==""?Constants.PORT:new DbManager().getPort());
     }
 
     @OnClick({R2.id.btn_edit})
     void onViewClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_edit) {
-            Constants.IP = mEdtIP.getText().toString();
-            Constants.PORT = mEdtPort.getText().toString();
-
+            new DbManager().setIp( mEdtIP.getText().toString());
+            new DbManager().setPort( mEdtPort.getText().toString());
             ToastUtil.showToast(ToastUtil.TPYE_SUCCESS, "修改成功");
-
+//            new AppDialog(_mActivity, DialogType.LOGIN).setTitle("登录")
+//                    .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+//                        @Override
+//                        public void onClick(String val) {
+//                        }
+//                    })
+//                    .setRightButton("确定", new AppDialog.OnLoginButtonClickListener() {
+//                                @Override
+//                                public void onClick(String account, String pwd) {
+//                                    mPresenter.login(new LoginBeanRequest(account, pwd));
+//                                }
+//                            }
+//
+//                    )
+//                    .show();
         }
     }
 
@@ -116,20 +130,11 @@ public class SettingIpFragment extends BaseActionBarFragment<SettingIpPresenter>
 
     }
 
-    @Override
-    public void showMessage(@NonNull String message) {
-        checkNotNull(message);
-        ArmsUtils.snackbarText(message);
-    }
 
     @Override
-    public void launchActivity(@NonNull Intent intent) {
-        checkNotNull(intent);
-        ArmsUtils.startActivity(intent);
-    }
-
-    @Override
-    public void killMyself() {
-
+    public void loginResult() {
+        new DbManager().setIp( mEdtIP.getText().toString());
+        new DbManager().setPort( mEdtPort.getText().toString());
+        ToastUtil.showToast(ToastUtil.TPYE_SUCCESS, "修改成功");
     }
 }

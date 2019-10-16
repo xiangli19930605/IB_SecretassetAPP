@@ -19,10 +19,10 @@ public class USBReceiver extends BroadcastReceiver {
             if (intent.getExtras().getBoolean("connected")){
                 content_state=true;
                 // usb 插入
-                Toast.makeText(context, "USB插入", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "USB插入", Toast.LENGTH_SHORT).show();
             }else{
                 //   usb 拔出
-                Toast.makeText(context, "USB拔出", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "USB拔出", Toast.LENGTH_SHORT).show();
                 content_state=false;
             }
         }

@@ -31,5 +31,12 @@ public interface PreferenceHelper {
 
     boolean getUsbState();
 
+    void setIp(String ip);
+
+    String getIp();
+
+    void setPort(String port);
+
+    String getPort();
 
 }

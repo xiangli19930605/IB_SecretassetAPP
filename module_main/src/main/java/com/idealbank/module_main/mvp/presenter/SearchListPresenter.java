@@ -5,6 +5,7 @@ import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.util.Log;
 
+import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.bean.Location;
 import com.idealbank.module_main.bean.UpAssetsBean;
 import com.idealbank.module_main.mvp.model.entity.UpLoad;
@@ -112,7 +113,7 @@ public class SearchListPresenter extends BasePresenter<SearchListContract.Model,
 
 
     public void getListByRfid(UpAssetsBean task) {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.getListByRfid(task)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔

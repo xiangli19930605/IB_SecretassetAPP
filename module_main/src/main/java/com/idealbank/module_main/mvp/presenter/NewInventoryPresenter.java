@@ -2,6 +2,7 @@ package com.idealbank.module_main.mvp.presenter;
 
 import android.app.Application;
 
+import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.bean.UpAssetsBean;
 import com.idealbank.module_main.bean.UpLoadAssetsBean;
 import com.idealbank.module_main.mvp.model.entity.UpLoad;
@@ -68,7 +69,7 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
 
 
     public void getListByRfid(UpAssetsBean task) {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.getListByRfid(task)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(1, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
@@ -89,7 +90,7 @@ public class NewInventoryPresenter extends BasePresenter<NewInventoryContract.Mo
     }
 
     public void saveCheckTask(UpLoadAssetsBean upLoadAssetsBean) {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.saveCheckTask(upLoadAssetsBean)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔

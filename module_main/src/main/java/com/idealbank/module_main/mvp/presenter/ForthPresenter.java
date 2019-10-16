@@ -2,6 +2,7 @@ package com.idealbank.module_main.mvp.presenter;
 
 import android.app.Application;
 
+import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.bean.Location;
 import com.idealbank.module_main.bean.OfflineBeanRequest;
 import com.jess.arms.integration.AppManager;
@@ -67,7 +68,7 @@ public class ForthPresenter extends BasePresenter<ForthContract.Model, ForthCont
     }
 
     public void getLocationList() {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.getLocationList()
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔
@@ -89,7 +90,7 @@ public class ForthPresenter extends BasePresenter<ForthContract.Model, ForthCont
     }
 
     public void getOffLinePermissionList(OfflineBeanRequest offlineBeanRequest) {
-        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + Constants.IP + ":" + Constants.PORT);
+        RetrofitUrlManager.getInstance().putDomain(Constants.WANGYI_DOMAIN_NAME, "http://" + new DbManager().getIp()+ ":" + new DbManager().getPort());
         mModel.getOffLinePermissionList(offlineBeanRequest)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))//遇到错误时重试,第一个参数为重试几次,第二个参数为重试的间隔

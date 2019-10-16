@@ -3,6 +3,7 @@ package me.jessyan.armscomponent.commonsdk.utils;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -20,6 +21,35 @@ import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 public class CommonUtils {
 
 
+    /**
+     * 判断以太网网络是否可用
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isIntenetConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mInternetNetWorkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
+            boolean hasInternet = !isNullObject(mInternetNetWorkInfo) && mInternetNetWorkInfo.isConnected() && mInternetNetWorkInfo.isAvailable();
+            return hasInternet;
+        }
+        return false;
+    }
+    /**
+     * 判断对象是否为空
+     *
+     * @param object
+     * @return
+     */
+    public static boolean isNullObject(Object object) {
+
+        if (object == null) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * 检查是否有可用网络
@@ -65,17 +95,14 @@ public class CommonUtils {
     public static int randomColor() {
         Random random = new Random();
         //0-190, 如果颜色值过大,就越接近白色,就看不清了,所以需要限定范围
-        int red =random.nextInt(150);
+        int red = random.nextInt(150);
         //0-190
-        int green =random.nextInt(150);
+        int green = random.nextInt(150);
         //0-190
-        int blue =random.nextInt(150);
+        int blue = random.nextInt(150);
         //使用rgb混合生成一种新的颜色,Color.rgb生成的是一个int数
-        return Color.rgb(red,green, blue);
+        return Color.rgb(red, green, blue);
     }
-
-
-
 
 
 }

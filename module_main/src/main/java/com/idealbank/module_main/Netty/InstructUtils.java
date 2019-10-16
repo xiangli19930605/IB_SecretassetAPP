@@ -7,6 +7,7 @@ import com.idealbank.module_main.bean.Location;
 import com.idealbank.module_main.bean.UpAssetsBean;
 import com.idealbank.module_main.bean.UpLoadAssetsBean;
 import com.idealbank.module_main.mvp.model.entity.UpLoad;
+import com.jess.arms.utils.ArmsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +73,9 @@ public class InstructUtils {
 
         return message;
     }
+
     //上传记录的Message
-    public static Message getUPLOADDATAMessage(String  createTime,String reason,  List<AssetsBean> mList) {
+    public static Message getUPLOADDATAMessage(String createTime, String reason, List<AssetsBean> mList) {
         Message message = new Message();
         message.setId(1);
         message.setType(MsgType.UPLOADDATA);
@@ -104,26 +106,27 @@ public class InstructUtils {
         upAssetsBean.setRfidId(rfidIdBean);
         return upAssetsBean;
     }
+
     //接口上传记录时   获取类
-    public static UpLoadAssetsBean getUpLoadAssetsBean(String  taskid,String  createTime,String reason,List<AssetsBean> mList) {
-        Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
-        if (location == null) {
-            LogUtils.e(location.getSpaceName());
-            return  null;
-        }
-        UpLoadAssetsBean upLoadAssetsBean = new UpLoadAssetsBean();
-        upLoadAssetsBean.setDeviceId(Integer.valueOf(location.getId()));
-        UpLoadAssetsBean.DataBean dataBean = new UpLoadAssetsBean.DataBean();
-        dataBean.setId(1);
-        UpLoad upLoad = new UpLoad();
-        upLoad.setCreateTime(createTime);
-        upLoad.setReason(reason);
-        upLoad.setPassFlag(1);
-        upLoad.setAssetList(mList);
-        upLoad.setTaskId(taskid);
-        dataBean.setResponseMessage(upLoad);
-        upLoadAssetsBean.setData(dataBean);
-        return upLoadAssetsBean;
+    public static UpLoadAssetsBean getUpLoadAssetsBean(String taskid, String createTime, String reason, List<AssetsBean> mList) {
+            Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
+            if (location == null) {
+                LogUtils.e(location.getSpaceName());
+                return null;
+            }
+            UpLoadAssetsBean upLoadAssetsBean = new UpLoadAssetsBean();
+            upLoadAssetsBean.setDeviceId(Integer.valueOf(location.getId()));
+            UpLoadAssetsBean.DataBean dataBean = new UpLoadAssetsBean.DataBean();
+            dataBean.setId(1);
+            UpLoad upLoad = new UpLoad();
+            upLoad.setCreateTime(createTime);
+            upLoad.setReason(reason);
+            upLoad.setPassFlag(1);
+            upLoad.setAssetList(mList);
+            upLoad.setTaskId(taskid);
+            dataBean.setResponseMessage(upLoad);
+            upLoadAssetsBean.setData(dataBean);
+            return upLoadAssetsBean;
     }
 
 

@@ -36,6 +36,7 @@ public interface EventBusTags {
 
     //搜索
     String SEARCH_RFID = "search_rfid";
+    String NETWORKCHANGE = "networkchange";
     String HISTORY = "history";
     String UPLOADDATA = "UPLOADDATA";//上传回应
 

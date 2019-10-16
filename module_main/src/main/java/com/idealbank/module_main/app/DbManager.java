@@ -7,6 +7,7 @@ import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.AssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.HistoryData;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.TaskBean;
+import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import me.jessyan.armscomponent.commonsdk.data.db.DbHelper;
 import me.jessyan.armscomponent.commonsdk.data.prefs.PreferenceHelper;
 
@@ -196,5 +197,31 @@ public class DbManager implements DbHelper , PreferenceHelper {
     public boolean getUsbState() {
         return  MyApplication.mComponent
                 .getAppDataManager().getUsbState();
+    }
+
+    @Override
+    public void setIp(String ip) {
+        MyApplication.mComponent
+                .getAppDataManager().setIp(ip);
+    }
+
+    @Override
+    public String getIp() {
+        return  MyApplication.mComponent
+                .getAppDataManager().getIp()==""? Constants.IP: MyApplication.mComponent
+                .getAppDataManager().getIp();
+    }
+
+    @Override
+    public void setPort(String port) {
+        MyApplication.mComponent
+                .getAppDataManager().setPort(port);
+    }
+
+    @Override
+    public String getPort() {
+        return  MyApplication.mComponent
+                .getAppDataManager().getPort()==""? Constants.PORT: MyApplication.mComponent
+                .getAppDataManager().getPort();
     }
 }

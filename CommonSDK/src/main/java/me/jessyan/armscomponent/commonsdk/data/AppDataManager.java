@@ -195,6 +195,26 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void setIp(String ip) {
+        mPreferencesHelper .setIp(ip);
+    }
+
+    @Override
+    public String getIp() {
+        return mPreferencesHelper .getIp();
+    }
+
+    @Override
+    public void setPort(String port) {
+        mPreferencesHelper .setPort(port);
+    }
+
+    @Override
+    public String getPort() {
+        return mPreferencesHelper .getPort();
+    }
+
+    @Override
     public Observable<String> testPigAvAddress(String url) {
         return null;
     }
