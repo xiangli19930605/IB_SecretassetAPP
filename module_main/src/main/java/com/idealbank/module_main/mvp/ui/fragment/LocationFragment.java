@@ -70,7 +70,6 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
     TextView tvLocation;
 
     boolean isSpinnerFirst = true;
-    SpinnerLocationAdapter mAdapter;
     Location selectedItemperson;
     private ListPopupWindow popupWindow;
 
@@ -106,7 +105,7 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
             tvLocation.setText(selectedItemperson.getSpaceName());
         }
 
-
+        initPopListView();
     }
 
     @Override
@@ -140,11 +139,8 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
                                     mPresenter.login(new LoginBeanRequest(account, pwd));
                                 }
                             }
-
                     )
                     .show();
-
-
         } else if (id == R.id.ll_spinner) {
             showPopListView();
         }
@@ -153,6 +149,11 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
     CustomPopWindow mListPopWindow;
 
     private void showPopListView() {
+        mPresenter.getLocationList();
+        mListPopWindow.showAsDropDown(tvLocation, 0, 20);
+    }
+
+    private void initPopListView() {
         View contentView = LayoutInflater.from(_mActivity).inflate(R.layout.pop_list, null);
         //处理popWindow 显示内容
         handleListView(contentView);
@@ -160,8 +161,7 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
         mListPopWindow = new CustomPopWindow.PopupWindowBuilder(_mActivity)
                 .setView(contentView)
                 .size(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)//显示大小
-                .create()
-                .showAsDropDown(tvLocation, 0, 20);
+                .create();
     }
 
     MyAdapter myAdapter = new MyAdapter(new ArrayList());
@@ -181,7 +181,6 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
             }
         });
         recyclerView.setAdapter(myAdapter);
-        myAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -191,7 +190,7 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
 
     @Override
     public void getLocation(ArrayList<Location> list) {
-        if(list.size()==0){
+        if (list.size() == 0) {
         }
         myAdapter.replaceData(list);
     }
@@ -202,5 +201,10 @@ public class LocationFragment extends BaseActionBarFragment<LocationPresenter> i
             new DbManager().setLocation(GsonUtil.GsonString(selectedItemperson));
             ToastUtil.showToast(ToastUtil.TPYE_SUCCESS, "修改成功");
         }
+    }
+
+    @Override
+    public void showErrorView() {
+        myAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
     }
 }

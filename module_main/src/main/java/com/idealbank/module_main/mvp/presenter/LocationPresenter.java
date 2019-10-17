@@ -75,6 +75,10 @@ public class LocationPresenter extends BasePresenter<LocationContract.Model, Loc
                     @Override
                     public void onNext(BaseResponseBean<ArrayList<Location>> assetsBean) {
                         mRootView.getLocation(assetsBean.getData());
+                    } @Override
+                    public void onError(Throwable t) {
+                        super.onError(t);
+                        mRootView.showErrorView();
                     }
                 });
     }
@@ -100,6 +104,7 @@ public class LocationPresenter extends BasePresenter<LocationContract.Model, Loc
                             ArmsUtils.snackbarText(bean.getMessage());
                         }
                     }
+
                 });
     }
 

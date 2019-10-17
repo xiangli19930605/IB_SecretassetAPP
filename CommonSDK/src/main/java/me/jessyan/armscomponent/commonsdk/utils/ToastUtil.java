@@ -50,27 +50,33 @@ public class ToastUtil {
     }
 
     public static void showToast(String s) {
-        if (toast == null) {
-            toast = Toast.makeText(MyApplication.getApplication(), s, Toast.LENGTH_SHORT);
-            toast.show();
-            oneTime = System.currentTimeMillis();
-        } else {
-            twoTime = System.currentTimeMillis();
-            if (s.equals(oldMsg)) {
-                if (twoTime - oneTime > Toast.LENGTH_SHORT) {
+        try {
+
+            if (toast == null) {
+                toast = Toast.makeText(MyApplication.getApplication(), s, Toast.LENGTH_SHORT);
+                toast.show();
+                oneTime = System.currentTimeMillis();
+            } else {
+                twoTime = System.currentTimeMillis();
+                if (s.equals(oldMsg)) {
+                    if (twoTime - oneTime > Toast.LENGTH_SHORT) {
+                        toast.show();
+                    }
+                } else {
+                    oldMsg = s;
+                    toast.setText(s);
                     toast.show();
                 }
-            } else {
-                oldMsg = s;
-                toast.setText(s);
-                toast.show();
             }
+            oldMsg = s;
+            oneTime = twoTime;
+        }catch (RuntimeException e){
         }
-        oldMsg = s;
-        oneTime = twoTime;
+
     }
 
     public static void showToast(int type, String s) {
+        try {
         if (toast == null) {
             toast = new Toast(MyApplication.getApplication());
         }
@@ -90,6 +96,8 @@ public class ToastUtil {
         txtToast.setText(s);
         toast.setView(toastLayout);
         toast.show();
+    }catch (RuntimeException e){
+    }
 
     }
 
