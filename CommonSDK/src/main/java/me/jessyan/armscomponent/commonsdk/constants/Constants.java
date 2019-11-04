@@ -52,7 +52,7 @@ public class Constants {
     public  static String IP = "192.168.2.150";
     public static   String PORT = "8092";
 
-    public static final boolean ISNETORSOCKET = false;//是否走接口还是socket
+    public static final boolean ISNETORSOCKET = true;//是否走接口还是socket
 
 
 

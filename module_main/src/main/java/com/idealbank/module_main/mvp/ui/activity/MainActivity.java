@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if (Constants.ISNETORSOCKET) {
+        if (!Constants.ISNETORSOCKET) {
             if (ServiceUtils.isServiceRunning(this, "com.idealbank.module_main.app.service.TestOneService")) {
                 ToastUtil.showToast("服务已开启");
             } else {

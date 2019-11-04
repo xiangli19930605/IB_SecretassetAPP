@@ -1,8 +1,12 @@
 package com.idealbank.module_main.mvp.ui.fragment;
 
 import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -84,6 +88,7 @@ import me.jessyan.armscomponent.commonsdk.utils.ToastUtil;
 import me.jessyan.autosize.utils.LogUtils;
 import me.yokeyword.fragmentation.SupportActivity;
 
+import static android.content.Context.VIBRATOR_SERVICE;
 import static me.jessyan.armscomponent.commonsdk.utils.ToastUtil.showToast;
 
 
@@ -104,6 +109,8 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     TextView tv_num;
     @BindView(R2.id.btn_finish)
     Button btn_finish;
+    @BindView(R2.id.btn_switch)
+    Button btn_switch;
     @Inject
     NewInventoryAdapter mAdapter;
 
@@ -146,18 +153,25 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                 showTipsDialog();
             }
         });
-        setRightText("开始盘点", new View.OnClickListener() {
+        setRightText("清空", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isopen) {
-                    setRightText("开始盘点");
-                    MyApplication.sv_Main.DoInventoryTag(false);
-                    isopen = false;
-                } else {
-                    setRightText("停止盘点");
-                    MyApplication.sv_Main.DoInventoryTag(true);
-                    isopen = true;
-                }
+                new AppDialog(_mActivity, DialogType.DEFAULT).setTitle("确定清空全部资产？")
+                        .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+                            @Override
+                            public void onClick(String val) {
+                            }
+                        })
+                        .setRightButton("确定", new AppDialog.OnButtonClickListener() {
+                            @Override
+                            public void onClick(String val) {
+                                new DbManager().delAssetsBeanWhereTaskId(taskid);
+                                getDate();
+                                showToast("清空成功");
+                            }
+                        })
+                        .show();
+
             }
         });
         initRecyclerView();
@@ -186,7 +200,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
     int a = 0;
 //    R2.id.btn_add, R2.id.btn_edit, R2.id.btn_query,
-    @OnClick({ R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow})
+    @OnClick({ R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow,R2.id.btn_switch})
     void onViewClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_finish) {
@@ -203,9 +217,9 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                     passFlag=1;
                     reason=val;
                     if (Constants.ISNETORSOCKET) {
-//                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
-                    }else{
                         mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
+                    }else{
+                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
                     }
                 }
             }).show();
@@ -220,12 +234,22 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                     passFlag=0;
                     reason=val;
                     if (Constants.ISNETORSOCKET) {
-//                      InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
-                    }else {
                         mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
+                    }else {
+                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
                     }
                 }
             }).show();
+        }else if(id == R.id.btn_switch){
+            if (isopen) {
+                btn_switch.setText("开始盘点");
+                MyApplication.sv_Main.DoInventoryTag(false);
+                isopen = false;
+            } else {
+                btn_switch.setText("停止盘点");
+                MyApplication.sv_Main.DoInventoryTag(true);
+                isopen = true;
+            }
         }
 //        else if (id == R.id.btn_edit) {
 //            new AppDialog(getContext(), DialogType.INPUT)
@@ -314,6 +338,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
 
 
+
     public void ChangeData(List<AssetsBean> list) {
 //查询数据库当前taskid 下的资产
         for (int i = 0; i < list.size(); i++) {
@@ -342,7 +367,10 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
      * 初始化RecyclerView
      */
     private void initRecyclerView() {
-        ArmsUtils.configRecyclerView(mRecyclerView, new LinearLayoutManager(getActivity()));
+        LinearLayoutManager layout = new LinearLayoutManager(getActivity());
+        layout.setStackFromEnd(true);//列表再底部开始展示，反转后由上面开始展示
+        layout.setReverseLayout(true);//列表翻转
+        ArmsUtils.configRecyclerView(mRecyclerView, layout);
         mRecyclerView.getItemAnimator().setChangeDuration(0);// 通过设置动画执行时间为0来解决闪烁问题
         mAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
@@ -544,6 +572,12 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 //                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
 //                getDate();
 //            }
+            //播放提示音并震动
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(_mActivity, notification);
+            r.play();
+            Vibrator vibrator = (Vibrator) _mActivity.getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(1000);
             if (CommonUtils.isNetworkConnected()) {
                 mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
             } else {

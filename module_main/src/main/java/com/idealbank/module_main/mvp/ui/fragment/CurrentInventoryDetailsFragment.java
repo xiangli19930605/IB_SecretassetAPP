@@ -295,9 +295,10 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
                     passFlag = 1;
                     reason = val;
                     if (Constants.ISNETORSOCKET) {
-//                      InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
+                        mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));
                     }else {
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));}
+                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(),val,mAdapter.getData()));
+                    }
                 }
             }).show();
         } else if (i == R.id.btn_allow) {
@@ -311,9 +312,10 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
                     passFlag = 0;
                     reason = val;
                     if (Constants.ISNETORSOCKET) {
-//                    InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(), val, mAdapter.getData()));
+                        mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));
                     }else {
-                    mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskBean.getTaskid(), taskBean.getCreateTime(), val, mAdapter.getData()));}
+                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(taskBean.getCreateTime(), val, mAdapter.getData()));
+                    }
                 }
             }).show();
         }
