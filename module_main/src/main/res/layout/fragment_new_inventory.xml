@@ -46,11 +46,14 @@
         android:layout_marginTop="@dimen/dp_12"
         android:layout_marginBottom="@dimen/dp_12"
         android:orientation="vertical">
-        <Button
+        <CheckBox
             android:id="@+id/btn_switch"
             android:layout_width="@dimen/dp_340"
             android:layout_height="33dp"
             android:layout_gravity="center"
+            android:checked="false"
+            android:button="@null"
+            android:gravity="center"
             android:background="@drawable/selector_finish_bg"
             android:text="开始盘点"
             android:textColor="@color/gray"

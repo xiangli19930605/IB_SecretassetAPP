@@ -117,6 +117,7 @@
                     android:id="@+id/tv_state"
                     android:clickable="false"
                     android:enabled="false"
+                    android:minHeight="@dimen/dp_30"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dp_10"

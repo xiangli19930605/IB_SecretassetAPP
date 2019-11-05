@@ -86,7 +86,7 @@ public class NewInventoryAdapter extends BaseQuickAdapter<AssetsBean, NewInvento
                     avi.setVisibility(View.VISIBLE);
                     data.setSelect(false);
                     data.setTime(System.currentTimeMillis());
-                    listener.click(helper.getLayoutPosition());
+//                    listener.click(helper.getLayoutPosition());
                 }
             });
             ((TextView) helper.getView(R.id.tv_state)).setTextColor(b ? Color.RED : Color.GREEN);
@@ -115,6 +115,7 @@ public class NewInventoryAdapter extends BaseQuickAdapter<AssetsBean, NewInvento
 
         helper.addOnClickListener(R.id.content)
                 .addOnClickListener(R.id.right)
+                .addOnClickListener(R.id.tv_state)
                 .addOnLongClickListener(R.id.ll_click);
 
 

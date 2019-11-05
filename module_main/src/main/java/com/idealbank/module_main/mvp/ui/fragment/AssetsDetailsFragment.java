@@ -84,9 +84,24 @@ public class AssetsDetailsFragment extends BaseActionBarFragment<AssetsDetailsPr
         stvBelongDept.setCenterString(assetsBean.getBelongDept());
         stvAssetUser.setCenterString(assetsBean.getAssetUser());
         stvAssetModel.setCenterString(assetsBean.getAssetModel());
-        stvAssetState.setCenterString(""+assetsBean.getAssetState());
-        stvPermissionState.setCenterString(""+assetsBean.getPermissionState());
 
+//        int permissionState=4;  //0 已授权     1 未授权 2     3      4查询中
+//        int assetState=0;    //0   待返回 1  已返回   2不需要返回
+
+        if(assetsBean.getAssetState()==0){
+            stvAssetState.setCenterString("待返回");
+        }else if(assetsBean.getAssetState()==1){
+            stvAssetState.setCenterString("已返回");
+        }else if(assetsBean.getAssetState()==2){
+            stvAssetState.setCenterString("不需要返回");
+        }
+        if(assetsBean.getPermissionState()==0){
+            stvPermissionState.setCenterString("已授权");
+        }else if(assetsBean.getPermissionState()==1){
+            stvPermissionState.setCenterString("未授权");
+        }else if(assetsBean.getPermissionState()==4){
+            stvPermissionState.setCenterString("查询中");
+        }
 
     }
 

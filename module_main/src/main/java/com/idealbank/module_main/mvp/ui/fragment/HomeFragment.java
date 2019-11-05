@@ -32,6 +32,7 @@ import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseFragment;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseRootFragment;
 import me.jessyan.armscomponent.commonsdk.bean.Event;
+import me.jessyan.armscomponent.commonsdk.constants.Constants;
 import me.jessyan.armscomponent.commonsdk.core.EventBusTags;
 import me.jessyan.armscomponent.commonsdk.core.RouterHub;
 import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
@@ -88,6 +89,7 @@ public class HomeFragment extends BaseFragment<HomePresenter> implements HomeCon
         if (i == R.id.btn_search) {
             ((MainFragment) getParentFragment()).startBrotherFragment(SearchListFragment.newInstance());
         } else if (i == R.id.btn_scan) {
+            if (Constants.ISNETORSOCKET) {
             Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
             if (location == null) {
                 new AppDialog(_mActivity, DialogType.DEFAULT).setTitle("未设置通道门位置，是否前去设置？")
@@ -104,6 +106,8 @@ public class HomeFragment extends BaseFragment<HomePresenter> implements HomeCon
                         })
                         .show();
             }else{
+                ((MainFragment) getParentFragment()).startBrotherFragment(NewInventoryFragment.newInstance());
+            }}else{
                 ((MainFragment) getParentFragment()).startBrotherFragment(NewInventoryFragment.newInstance());
             }
         } else if (i == R.id.btn_current) {

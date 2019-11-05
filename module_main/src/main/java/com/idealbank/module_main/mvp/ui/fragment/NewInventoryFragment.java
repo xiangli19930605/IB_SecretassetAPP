@@ -5,6 +5,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
@@ -16,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +30,7 @@ import com.idealbank.module_main.Netty.bean.Message;
 import com.idealbank.module_main.Netty.bean.MsgType;
 import com.idealbank.module_main.R2;
 
+import butterknife.OnCheckedChanged;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -110,7 +114,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     @BindView(R2.id.btn_finish)
     Button btn_finish;
     @BindView(R2.id.btn_switch)
-    Button btn_switch;
+    CheckBox btn_switch;
     @Inject
     NewInventoryAdapter mAdapter;
 
@@ -182,7 +186,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         createTime = DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL);
         tv_time.setText(createTime);
         //增加任务
-         taskBean = new TaskBean();
+        taskBean = new TaskBean();
         taskBean.setState(0);
         taskBean.setTaskid(taskid);
         taskBean.setNumber(mAdapter.getData().size());
@@ -196,11 +200,14 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         MyApplication.sv_Main.DoInventoryTag(false);
         // rfid power on
         MyApplication.sv_Main.gpio_rfid_config(true);
+
+        time = new TimeCount(10000, 1000);
     }
 
     int a = 0;
-//    R2.id.btn_add, R2.id.btn_edit, R2.id.btn_query,
-    @OnClick({ R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow,R2.id.btn_switch})
+
+    //    R2.id.btn_add, R2.id.btn_edit, R2.id.btn_query,
+    @OnClick({R2.id.btn_finish, R2.id.btn_refuse, R2.id.btn_allow, R2.id.btn_switch})
     void onViewClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_finish) {
@@ -209,47 +216,37 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         } else if (id == R.id.btn_refuse) {
             if (mAdapter.getData().size() == 0) {
                 ArmsUtils.snackbarText("请添加资产再提交");
-                return ;
+                return;
             }
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择拒绝通行理由").setItemType(AppDialog.REFUSE).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
-                    passFlag=1;
-                    reason=val;
+                    passFlag = 1;
+                    reason = val;
                     if (Constants.ISNETORSOCKET) {
                         mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
-                    }else{
-                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
+                    } else {
+                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime, val, mAdapter.getData()));
                     }
                 }
             }).show();
         } else if (id == R.id.btn_allow) {
             if (mAdapter.getData().size() == 0) {
                 ArmsUtils.snackbarText("请添加资产再提交");
-                return ;
+                return;
             }
             new AppDialog(_mActivity, DialogType.SINGLECHOICE).setTitle("请选择允许通行理由").setItemType(AppDialog.ALLOW).setRightButton("确定", new AppDialog.OnSingleSelectButtonClickListener() {
                 @Override
                 public void onClick(String val) {
-                    passFlag=0;
-                    reason=val;
+                    passFlag = 0;
+                    reason = val;
                     if (Constants.ISNETORSOCKET) {
                         mPresenter.saveCheckTask(InstructUtils.getUpLoadAssetsBean(taskid, createTime, val, mAdapter.getData()));
-                    }else {
-                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime,val,mAdapter.getData()));
+                    } else {
+                        InstructUtils.send(InstructUtils.getUPLOADDATAMessage(createTime, val, mAdapter.getData()));
                     }
                 }
             }).show();
-        }else if(id == R.id.btn_switch){
-            if (isopen) {
-                btn_switch.setText("开始盘点");
-                MyApplication.sv_Main.DoInventoryTag(false);
-                isopen = false;
-            } else {
-                btn_switch.setText("停止盘点");
-                MyApplication.sv_Main.DoInventoryTag(true);
-                isopen = true;
-            }
         }
 //        else if (id == R.id.btn_edit) {
 //            new AppDialog(getContext(), DialogType.INPUT)
@@ -322,6 +319,25 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
     }
 
+    @OnCheckedChanged({R2.id.btn_switch})
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView.getId() == R.id.btn_switch) {
+            Log.e("isChecked", "" + isChecked);
+            if (isChecked) {
+                // rfid power on
+//                MyApplication.sv_Main.gpio_rfid_config(true);
+                MyApplication.sv_Main.DoInventoryTag(true);
+                btn_switch.setText("停止盘点");
+                time.start();
+            } else {
+                btn_switch.setText("开始盘点");
+//                MyApplication.sv_Main.gpio_rfid_config(false);
+                MyApplication.sv_Main.DoInventoryTag(false);
+                time.onFinish();
+            }
+        }
+    }
+
     private void getDate() {
         mList = new DbManager().queryAssetsBeanWhereTaskid(taskid);
         mAdapter.replaceData(mList);
@@ -333,10 +349,6 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     protected void initEventAndData() {
 
     }
-
-
-
-
 
 
     public void ChangeData(List<AssetsBean> list) {
@@ -385,14 +397,34 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                             .setRightButton("确定", new AppDialog.OnButtonClickListener() {
                                 @Override
                                 public void onClick(String val) {
-                                    new DbManager().delAssetsBeanWhereId(mList.get(position).getUid());
+                                    new DbManager().delAssetsBeanWhereId(mAdapter.getData().get(position).getUid());
                                     showToast("删除成功");
                                     getDate();
                                 }
                             })
                             .show();
                 } else if (view.getId() == R.id.content) {
-                    start(AssetsDetailsFragment.newInstance(mList.get(position)));
+                    start(AssetsDetailsFragment.newInstance(mAdapter.getData().get(position)));
+                } else if (view.getId() == R.id.tv_state) {
+                    List<AssetsBean> addData = new ArrayList<>();
+                    AssetsBean assetsBean = mAdapter.getData().get(position);
+                    addData.add(assetsBean);
+                    if (Constants.ISNETORSOCKET) {
+                        if (CommonUtils.isNetworkConnected()) {
+                            mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+                        } else {
+                            RfidDataUtils.changeOffline(addData, taskid);
+                            getDate();
+                        }
+                    } else {
+                        //判断是否离线，离线访问离线数据库，不是离线，访问请求
+                        if (UsbUtils.getUsbType()) {
+                            InstructUtils.send(InstructUtils.getRFIDMessage(addData));
+                        } else {
+                            RfidDataUtils.changeOffline(_mActivity, addData, taskid);
+                            getDate();
+                        }
+                    }
                 }
             }
         });
@@ -444,6 +476,31 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 
     }
 
+    private TimeCount time;
+
+    class TimeCount extends CountDownTimer {
+        public TimeCount(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            if (btn_switch != null && btn_switch.isChecked()) {
+                btn_switch.setText("停止盘点倒计时" + "(" + millisUntilFinished / 1000 + ") ");
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            if (btn_switch != null) {
+                btn_switch.setText("开始盘点");
+                btn_switch.setChecked(false);
+            }
+            MyApplication.sv_Main.DoInventoryTag(false);
+//            closeRfid();
+        }
+    }
+
     @Override
     public void setData(@Nullable Object data) {
 
@@ -482,6 +539,22 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     @Override
     public void onDestroy() {
         super.onDestroy();
+        closeRfid();
+        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
+    }
+
+    private void openRfid() {
+        //开启服务
+        boolean b = MyApplication.sv_Main.Create(OnMsg);
+        //先关闭盘点
+        MyApplication.sv_Main.DoInventoryTag(false);
+        // rfid power on
+        MyApplication.sv_Main.gpio_rfid_config(true);
+
+        MyApplication.sv_Main.DoInventoryTag(true);
+    }
+
+    private void closeRfid() {
         try {
             MyApplication.sv_Main.DoInventoryTag(false);
             MyApplication.sv_Main.DoIndentify(false);
@@ -492,8 +565,6 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         } catch (Exception e) {
             System.out.print("******************");
         }
-        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
-
     }
 
     //接受终端返回的数据
@@ -508,13 +579,14 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
                 taskBean.setReason(reason);
                 taskBean.setState(1);
                 taskBean.setNumber(mAdapter.getData().size());
-                new DbManager().upDateTaskBeanWhereId(taskBean.getId(),taskBean);
+                new DbManager().upDateTaskBeanWhereId(taskBean.getId(), taskBean);
                 EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_HIS);
             } else {
                 showToast(ToastUtil.TPYE_FAILURE, "上传失败");
             }
         }
     }
+
     //接口接收
     @Override
     public void receiveResult(ArrayList<AssetsBean> list) {
@@ -531,7 +603,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         taskBean.setReason(reason);
         taskBean.setState(1);
         taskBean.setNumber(mAdapter.getData().size());
-        new DbManager().upDateTaskBeanWhereId(taskBean.getId(),taskBean);
+        new DbManager().upDateTaskBeanWhereId(taskBean.getId(), taskBean);
         EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_HIS);
         pop();
     }
@@ -564,26 +636,30 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
             //再插入数据
             new DbManager().insertAssetsBean(assetsBean);
             getDate();
-            //判断是否离线，离线访问离线数据库，不是离线，访问请求
-            //            if (UsbUtils.getUsbType()) {
-//                InstructUtils.send(InstructUtils.getRFIDMessage(addData));
-//
-//            } else {
-//                RfidDataUtils.changeOffline(_mActivity, addData, taskid);
-//                getDate();
-//            }
+
             //播放提示音并震动
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone r = RingtoneManager.getRingtone(_mActivity, notification);
             r.play();
             Vibrator vibrator = (Vibrator) _mActivity.getSystemService(VIBRATOR_SERVICE);
             vibrator.vibrate(1000);
-            if (CommonUtils.isNetworkConnected()) {
-                mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+            if (Constants.ISNETORSOCKET) {
+                if (CommonUtils.isNetworkConnected()) {
+                    mPresenter.getListByRfid(InstructUtils.getUpAssetsBean(addData));
+                } else {
+                    RfidDataUtils.changeOffline(addData, taskid);
+                    getDate();
+                }
             } else {
-                RfidDataUtils.changeOffline(addData, taskid);
-                getDate();
+                //判断是否离线，离线访问离线数据库，不是离线，访问请求
+                if (UsbUtils.getUsbType()) {
+                    InstructUtils.send(InstructUtils.getRFIDMessage(addData));
+                } else {
+                    RfidDataUtils.changeOffline(_mActivity, addData, taskid);
+                    getDate();
+                }
             }
+
 
         }
     }
@@ -593,15 +669,15 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     private void networkchange(Event event) {
         //位于栈顶才接收
         if (getTopFragment() instanceof NewInventoryFragment) {
-                    if(event.getAction().equals("NOCONNECT" )){
-                        new AppDialog(_mActivity)
-                                .setTitle("提示")
-                                .setContent("以太网连接断开，将进行离线模式")
-                                .setSingleButton()
-                                .show();
-                    }else if(event.getAction().equals("NET_ETHERNET" )){
-                        ToastUtil.showToast("已连接以太网");
-                    }
+            if (event.getAction().equals("NOCONNECT")) {
+                new AppDialog(_mActivity)
+                        .setTitle("提示")
+                        .setContent("以太网连接断开，将进行离线模式")
+                        .setSingleButton()
+                        .show();
+            } else if (event.getAction().equals("NET_ETHERNET")) {
+                ToastUtil.showToast("已连接以太网");
+            }
         }
     }
 }
