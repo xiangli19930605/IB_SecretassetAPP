@@ -1,6 +1,9 @@
 package com.idealbank.module_main.mvp.ui.fragment;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +22,6 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.idealbank.module_main.Netty.ChannelMap;
 import com.idealbank.module_main.Netty.InstructUtils;
-import com.idealbank.module_main.Netty.bean.Message;
 import com.idealbank.module_main.Netty.bean.MsgType;
 import com.idealbank.module_main.R;
 import com.idealbank.module_main.R2;
@@ -46,6 +50,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -99,7 +104,8 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
     Boolean isopen = false;
     private int passFlag;   //0允许，1拒绝
     private String reason;   //理由
-
+    @BindView(R2.id.btn_switch)
+    CheckBox btn_switch;
     public ONDEVMESSAGE OnMsg = new ONDEVMESSAGE();
 
     public static CurrentInventoryDetailsFragment newInstance(TaskBean taskBean) {
@@ -129,18 +135,24 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
     public void initData(@Nullable Bundle savedInstanceState) {
 
         setTitleText("任务详情");
-        setRightText("开始盘点", new View.OnClickListener() {
+        setRightText("清空", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isopen) {
-                    setRightText("开始盘点");
-                    MyApplication.sv_Main.DoInventoryTag(false);
-                    isopen = false;
-                } else {
-                    setRightText("停止盘点");
-                    MyApplication.sv_Main.DoInventoryTag(true);
-                    isopen = true;
-                }
+                new AppDialog(_mActivity, DialogType.DEFAULT).setTitle("确定清空全部资产？")
+                        .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+                            @Override
+                            public void onClick(String val) {
+                            }
+                        })
+                        .setRightButton("确定", new AppDialog.OnButtonClickListener() {
+                            @Override
+                            public void onClick(String val) {
+                                new DbManager().delAssetsBeanWhereTaskId(taskBean.getTaskid());
+                                getDate();
+                                showToast("清空成功");
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -150,12 +162,14 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
         mRecyclerView.setAdapter(mAdapter);
         getDate();
 
-        //开启服务
-        boolean b = MyApplication.sv_Main.Create(OnMsg);
-        //先关闭盘点
-        MyApplication.sv_Main.DoInventoryTag(false);
-        // rfid power on
-        MyApplication.sv_Main.gpio_rfid_config(true);
+        time = new TimeCount(10000, 1000);
+//        //开启服务
+//        boolean b = MyApplication.sv_Main.Create(OnMsg);
+//        //先关闭盘点
+//        MyApplication.sv_Main.DoInventoryTag(false);
+//        // rfid power on
+//        MyApplication.sv_Main.gpio_rfid_config(true);
+
         Observable.interval(0, 1, TimeUnit.SECONDS)
                 .map(new Function<Long, Long>() {
                     @Override
@@ -320,7 +334,21 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
             }).show();
         }
     }
-
+    @OnCheckedChanged({R2.id.btn_switch})
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView.getId() == R.id.btn_switch) {
+            Log.e("isChecked", "" + isChecked);
+            if (isChecked) {
+                openRfid();
+                btn_switch.setText("停止盘点");
+                time.start();
+            } else {
+                btn_switch.setText("开始盘点");
+                closeRfid();
+                time.onFinish();
+            }
+        }
+    }
     //接受终端返回的数据
     @Subscriber(tag = EventBusTags.SEARCH_RFID)
     private void updateUser(Event event) {
@@ -412,10 +440,58 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
         }
         getDate();
     }
+    private TimeCount time;
 
+    class TimeCount extends CountDownTimer {
+        public TimeCount(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            if (btn_switch != null && btn_switch.isChecked()) {
+                btn_switch.setText("停止盘点倒计时" + "(" + millisUntilFinished / 1000 + ") ");
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            if (btn_switch != null) {
+                btn_switch.setText("开始盘点");
+                btn_switch.setChecked(false);
+            }
+            closeRfid();
+        }
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
+        time.onFinish();
+        time=null;
+        closeRfid();
+        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
+
+    }
+    //创建handler
+    final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            MyApplication.sv_Main.DoInventoryTag(true);
+        }
+    };
+    private void openRfid() {
+        //开启服务
+        boolean b = MyApplication.sv_Main.Create(OnMsg);
+        //先关闭盘点
+        MyApplication.sv_Main.DoInventoryTag(false);
+        // rfid power on
+        MyApplication.sv_Main.gpio_rfid_config(true);
+        handler.sendMessageDelayed(new Message(),2000);
+
+    }
+
+    private void closeRfid() {
         try {
             MyApplication.sv_Main.DoInventoryTag(false);
             MyApplication.sv_Main.DoIndentify(false);
@@ -426,10 +502,7 @@ public class CurrentInventoryDetailsFragment extends BaseActionBarFragment<Curre
         } catch (Exception e) {
             System.out.print("******************");
         }
-        EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
-
     }
-
 
     //接口接收
     @Override

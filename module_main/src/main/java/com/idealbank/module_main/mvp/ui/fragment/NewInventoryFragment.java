@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Message;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.idealbank.module_main.Netty.ChannelMap;
 import com.idealbank.module_main.Netty.InstructUtils;
-import com.idealbank.module_main.Netty.bean.Message;
 import com.idealbank.module_main.Netty.bean.MsgType;
 import com.idealbank.module_main.R2;
 
@@ -194,12 +194,7 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         taskBean.setFinishTime(DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_TOTAL));
         new DbManager().insertTaskBean(taskBean);
 
-        //开启服务
-        boolean b = MyApplication.sv_Main.Create(OnMsg);
-        //先关闭盘点
-        MyApplication.sv_Main.DoInventoryTag(false);
-        // rfid power on
-        MyApplication.sv_Main.gpio_rfid_config(true);
+
 
         time = new TimeCount(10000, 1000);
     }
@@ -324,15 +319,14 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         if (buttonView.getId() == R.id.btn_switch) {
             Log.e("isChecked", "" + isChecked);
             if (isChecked) {
-                // rfid power on
-//                MyApplication.sv_Main.gpio_rfid_config(true);
-                MyApplication.sv_Main.DoInventoryTag(true);
+//                MyApplication.sv_Main.DoInventoryTag(true);
+                openRfid();
                 btn_switch.setText("停止盘点");
                 time.start();
             } else {
                 btn_switch.setText("开始盘点");
-//                MyApplication.sv_Main.gpio_rfid_config(false);
-                MyApplication.sv_Main.DoInventoryTag(false);
+                closeRfid();
+//                MyApplication.sv_Main.DoInventoryTag(false);
                 time.onFinish();
             }
         }
@@ -500,7 +494,14 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
 //            closeRfid();
         }
     }
-
+    //创建handler
+    final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            MyApplication.sv_Main.DoInventoryTag(true);
+        }
+    };
     @Override
     public void setData(@Nullable Object data) {
 
@@ -539,7 +540,8 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
     @Override
     public void onDestroy() {
         super.onDestroy();
-        closeRfid();
+        time.onFinish();
+        time=null;
         EventBusUtils.sendEvent(new Event(""), EventBusTags.REFRESH_CUR);
     }
 
@@ -550,8 +552,8 @@ public class NewInventoryFragment extends BaseActionBarFragment<NewInventoryPres
         MyApplication.sv_Main.DoInventoryTag(false);
         // rfid power on
         MyApplication.sv_Main.gpio_rfid_config(true);
+        handler.sendMessageDelayed(new Message(),2000);
 
-        MyApplication.sv_Main.DoInventoryTag(true);
     }
 
     private void closeRfid() {

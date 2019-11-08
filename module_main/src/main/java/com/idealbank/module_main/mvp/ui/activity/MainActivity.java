@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.idealbank.module_main.Netty.ServiceUtils;
 import com.idealbank.module_main.app.DbManager;
+import com.idealbank.module_main.app.rfid_module.ONDEVMESSAGE;
 import com.idealbank.module_main.app.service.NetWorkReceiver;
 import com.idealbank.module_main.app.service.TestOneService;
 import com.idealbank.module_main.mvp.ui.fragment.MainFragment;
@@ -39,6 +40,7 @@ import javax.inject.Inject;
 import me.jessyan.armscomponent.commonres.dialog.AppDialog;
 import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonres.dialog.LoadingDialog;
+import me.jessyan.armscomponent.commonsdk.app.MyApplication;
 import me.jessyan.armscomponent.commonsdk.base.activity.BaseActivity;
 import me.jessyan.armscomponent.commonsdk.bean.Event;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
@@ -93,7 +95,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
             receiver = null;
         }
     }
-
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
         if (findFragment(MainFragment.class) == null) {
@@ -153,7 +154,10 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, intentFilter);
+
+
     }
+    public ONDEVMESSAGE OnMsg = new ONDEVMESSAGE();
 
     @Inject
     RxErrorHandler mErrorHandler;
