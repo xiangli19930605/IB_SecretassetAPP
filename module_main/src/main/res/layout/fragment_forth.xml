@@ -99,6 +99,15 @@
         android:text="WEBSOCKET" />
 
 
+    <com.allen.library.SuperTextView
+        android:id="@+id/btn_version"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        stv:sDividerLineType="both"
+        stv:sLeftTextString="当前版本"
+        stv:sRightTextString=""
+        stv:sRightTextColor="@color/gray"
+        stv:sRightIconRes="@mipmap/arrow_right_red" />
 
 
 </LinearLayout>

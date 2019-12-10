@@ -1,17 +1,22 @@
 package com.idealbank.module_main.mvp.ui.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.AppCompatCheckBox;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
+import com.allen.library.SuperTextView;
 import com.idealbank.module_main.R2;
 import com.idealbank.module_main.app.DbManager;
 import com.idealbank.module_main.app.service.NetWorkReceiver;
@@ -56,6 +61,8 @@ import static com.jess.arms.utils.Preconditions.checkNotNull;
 public class ForthFragment extends BaseFragment<ForthPresenter> implements ForthContract.View, CompoundButton.OnCheckedChangeListener {
     @BindView(R2.id.cb_setting_night)
     AppCompatCheckBox mCbSettingNight;
+    @BindView(R2.id.btn_version)
+    SuperTextView btn_version;
     protected LoadingDialog loadingDialog;
 
     public static ForthFragment newInstance() {
@@ -84,9 +91,22 @@ public class ForthFragment extends BaseFragment<ForthPresenter> implements Forth
         mCbSettingNight.setOnCheckedChangeListener(this);
         loadingDialog = new LoadingDialog(_mActivity);
 
-
+        btn_version.setRightString( getAppVersionName(_mActivity));
     }
-
+    /**
+     * 返回当前程序版本名
+     */
+    public static String getAppVersionName(Context context) {
+        String versionName=null;
+        try {
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+        } catch (Exception e) {
+            Log.e("VersionInfo", "Exception", e);
+        }
+        return versionName;
+    }
     @Override
     public void setData(@Nullable Object data) {
 
