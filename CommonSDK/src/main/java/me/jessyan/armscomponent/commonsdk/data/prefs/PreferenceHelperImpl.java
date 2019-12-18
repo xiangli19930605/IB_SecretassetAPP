@@ -53,6 +53,16 @@ public class PreferenceHelperImpl implements PreferenceHelper {
     }
 
     @Override
+    public void setUpdataTime(String time) {
+        mPreferences.edit().putString(Constants.UPDATATIME, time).apply();
+    }
+
+    @Override
+    public String getUpdataTime() {
+        return mPreferences.getString(Constants.UPDATATIME, "");
+    }
+
+    @Override
     public void setUsbState(boolean b) {
         mPreferences.edit().putBoolean(Constants.USB_STATE, b).apply();
     }

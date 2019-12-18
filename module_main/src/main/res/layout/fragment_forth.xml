@@ -81,15 +81,6 @@
     </LinearLayout>
 
 
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/cb_setting_night"
-        android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:button="@drawable/abc_btn_check_material"
-        android:buttonTint="@color/colorAccent"
-        tools:ignore="PrivateResource" />
-
 
     <Button
         android:visibility="invisible"
@@ -108,6 +99,14 @@
         stv:sRightTextString=""
         stv:sRightTextColor="@color/gray"
         stv:sRightIconRes="@mipmap/arrow_right_red" />
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/cb_setting_night"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/abc_btn_check_material"
+        android:buttonTint="@color/colorAccent"
+        tools:ignore="PrivateResource" />
 
 
 </LinearLayout>

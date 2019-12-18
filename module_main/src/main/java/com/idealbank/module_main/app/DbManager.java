@@ -188,6 +188,18 @@ public class DbManager implements DbHelper , PreferenceHelper {
     }
 
     @Override
+    public void setUpdataTime(String time) {
+           MyApplication.mComponent
+                .getAppDataManager().setUpdataTime(time);
+    }
+
+    @Override
+    public String getUpdataTime() {
+        return   MyApplication.mComponent
+                .getAppDataManager().getUpdataTime();
+    }
+
+    @Override
     public void setUsbState(boolean b) {
           MyApplication.mComponent
                 .getAppDataManager().setUsbState(b);

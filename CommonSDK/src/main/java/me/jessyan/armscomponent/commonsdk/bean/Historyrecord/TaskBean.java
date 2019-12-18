@@ -7,7 +7,7 @@ import org.greenrobot.greendao.annotation.Id;
 import java.io.Serializable;
 
 @Entity
-public class TaskBean implements Serializable {
+public class TaskBean extends  SelectIlem implements Serializable {
 
     private static final long serialVersionUID = 5298086812218887585L;
     //ID主键自增

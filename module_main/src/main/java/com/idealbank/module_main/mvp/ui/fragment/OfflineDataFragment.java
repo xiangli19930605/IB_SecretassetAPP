@@ -36,6 +36,8 @@ import me.jessyan.armscomponent.commonres.dialog.DialogType;
 import me.jessyan.armscomponent.commonres.dialog.LoadingDialog;
 import me.jessyan.armscomponent.commonsdk.base.fragment.BaseActionBarFragment;
 import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.OffLineAssetsBean;
+import me.jessyan.armscomponent.commonsdk.constants.Constants;
+import me.jessyan.armscomponent.commonsdk.utils.DateUtils;
 import me.jessyan.armscomponent.commonsdk.utils.GsonUtil;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
@@ -55,6 +57,7 @@ public class OfflineDataFragment extends BaseActionBarFragment<OfflineDataPresen
     SuperTextView stv_num;
     @BindView(R2.id.txt_tips)
     TextView txt_tips;
+
     public static OfflineDataFragment newInstance() {
         OfflineDataFragment fragment = new OfflineDataFragment();
         return fragment;
@@ -79,8 +82,9 @@ public class OfflineDataFragment extends BaseActionBarFragment<OfflineDataPresen
     public void initData(@Nullable Bundle savedInstanceState) {
         setTitleText("获取离线数据");
         loadingDialog = new LoadingDialog(_mActivity);
-        List<OffLineAssetsBean> list=  new DbManager().  loadAllOffLineAssetsBean  ();
-        stv_num.setCenterString(""+list.size());
+        List<OffLineAssetsBean> list = new DbManager().loadAllOffLineAssetsBean();
+        stv_num.setCenterString("" + list.size());
+        stv_time.setCenterString(new DbManager().getUpdataTime());
     }
 
     @OnClick({R2.id.btn_updata})
@@ -89,7 +93,7 @@ public class OfflineDataFragment extends BaseActionBarFragment<OfflineDataPresen
         if (i == R.id.btn_updata) {
             Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
             if (location != null) {
-                OfflineBeanRequest offlineBeanRequest=new OfflineBeanRequest();
+                OfflineBeanRequest offlineBeanRequest = new OfflineBeanRequest();
                 offlineBeanRequest.setDeviceId(location.getId());
                 offlineBeanRequest.setRfidId("");
                 mPresenter.getOffLinePermissionList(offlineBeanRequest);
@@ -98,7 +102,7 @@ public class OfflineDataFragment extends BaseActionBarFragment<OfflineDataPresen
                 } else {
                     loadingDialog.show();
                 }
-            }else{
+            } else {
                 new AppDialog(_mActivity, DialogType.DEFAULT).setTitle("未设置通道门位置，是否前去设置？")
                         .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
                             @Override
@@ -115,7 +119,6 @@ public class OfflineDataFragment extends BaseActionBarFragment<OfflineDataPresen
 
 
             }
-
 
 
         }
@@ -152,7 +155,9 @@ public class OfflineDataFragment extends BaseActionBarFragment<OfflineDataPresen
         dismissLoading();
         new DbManager().clearOffLineAssetsBean();
         new DbManager().insertInTxOffLineAssetsBean(list);
-
-        txt_tips.setText("本次更新"+list.size()+"条数据");
+        new DbManager().setUpdataTime(DateUtils.getCurrentDateStr(Constants.DATE_FORMAT_ALL));
+        txt_tips.setText("本次更新" + list.size() + "条数据");
+        stv_time.setCenterString(new DbManager().getUpdataTime());
+        stv_num.setCenterString("" + list.size());
     }
 }

@@ -26,6 +26,10 @@ public interface PreferenceHelper {
 
     String getLocation();
 
+    void setUpdataTime(String time);
+
+    String getUpdataTime();
+
     //获取USB状态
     void setUsbState(boolean b);
 
@@ -38,5 +42,6 @@ public interface PreferenceHelper {
     void setPort(String port);
 
     String getPort();
+
 
 }

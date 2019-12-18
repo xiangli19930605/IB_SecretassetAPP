@@ -1,14 +1,19 @@
 package com.idealbank.module_main.mvp.ui.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.idealbank.module_main.Netty.InstructUtils;
@@ -67,7 +72,18 @@ public class HistoricalInventoryFragment extends BaseRootFragment<HistoricalInve
     HistoryInventoryAdapter mAdapter;
     @Inject
     List<TaskBean> mList;
-
+    @BindView(R2.id.ll_mycollection_bottom_dialog)
+    LinearLayout mLlMycollectionBottomDialog;
+    @BindView(R2.id.btn_delete)
+    Button mBtnDelete;
+    @BindView(R2.id.select_all)
+    TextView mSelectAll;
+    private static final int MYLIVE_MODE_CHECK = 0;
+    private static final int MYLIVE_MODE_EDIT = 1;
+    private int mEditMode = MYLIVE_MODE_CHECK;
+    private boolean isSelectAll = false;
+    private boolean editorStatus = false;
+    private int index = 0;
     public static HistoricalInventoryFragment newInstance() {
         HistoricalInventoryFragment fragment = new HistoricalInventoryFragment();
         return fragment;
@@ -93,11 +109,30 @@ public class HistoricalInventoryFragment extends BaseRootFragment<HistoricalInve
     public void initData(@Nullable Bundle savedInstanceState) {
         Log.e(TAG, "initData");
         setTitleText("历史记录");
+        setRightText("编辑", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updataEditMode();
+            }
+        });
         initRecyclerView();
         mRecyclerView.setAdapter(mAdapter);
         getDate();
     }
-
+    private void updataEditMode() {
+        mEditMode = mEditMode == MYLIVE_MODE_CHECK ? MYLIVE_MODE_EDIT : MYLIVE_MODE_CHECK;
+        if (mEditMode == MYLIVE_MODE_EDIT) {
+            setRightText("取消");
+            mLlMycollectionBottomDialog.setVisibility(View.VISIBLE);
+            editorStatus = true;
+        } else {
+            setRightText("编辑");
+            mLlMycollectionBottomDialog.setVisibility(View.GONE);
+            editorStatus = false;
+//            clearAll();
+        }
+        mAdapter.setEditMode(mEditMode);
+    }
     @Override
     protected void reload() {
 
@@ -115,13 +150,12 @@ public class HistoricalInventoryFragment extends BaseRootFragment<HistoricalInve
 //                mAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
 //            }
 //        } else {}
-            mList = new DbManager().queryTaskBeanWhereState(1);
-            Collections.reverse(mList);
-            mAdapter.replaceData(mList);
-            if (mList.size() == 0) {
-                mAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
-            }
-
+        mList = new DbManager().queryTaskBeanWhereState(1);
+        Collections.reverse(mList);
+        mAdapter.replaceData(mList);
+        if (mList.size() == 0) {
+            mAdapter.setEmptyView(LayoutInflater.from(getContext()).inflate(R.layout.empty_layout, null));
+        }
         refreshLayout.finishRefresh();
     }
 
@@ -179,14 +213,103 @@ public class HistoricalInventoryFragment extends BaseRootFragment<HistoricalInve
 
     }
 
-    @OnClick({R2.id.fab})
+    @OnClick({R2.id.fab, R2.id.btn_delete, R2.id.select_all})
     void onClick(View view) {
         int i = view.getId();
         if (i == R.id.fab) {
             mRecyclerView.smoothScrollToPosition(0);
+        } else if (i == R.id.btn_delete) {
+            deleteVideo();
+        } else if (i == R.id.select_all) {
+            selectAllMain();
         }
     }
 
+    /**
+     * 删除逻辑
+     */
+    private void deleteVideo() {
+        if (index == 0) {
+            mBtnDelete.setEnabled(false);
+            return;
+        }
+        new AppDialog(_mActivity, DialogType.DEFAULT).setContent("删除后不可恢复，是否删除这" + index + "个条目？")
+                .setLeftButton("取消", new AppDialog.OnButtonClickListener() {
+                    @Override
+                    public void onClick(String val) {
+                    }
+                })
+                .setRightButton("确定", new AppDialog.OnButtonClickListener() {
+                    @Override
+                    public void onClick(String val) {
+                        for (int i = mAdapter.getData().size(), j = 0; i > j; i--) {
+                            TaskBean myLive = mAdapter.getData().get(i - 1);
+                            if (myLive.isSelect()) {
+                                new DbManager().delTaskBeanWhereId(mAdapter.getData().get(i-1).getId());
+//删除该任务id下的资产
+                                new DbManager().delAssetsBeanWhereId(mAdapter.getData().get(i-1).getId());
+                                mAdapter.getData().remove(myLive);
+                                index--;
+                            }
+                        }
+                        index = 0;
+//                        mTvSelectNum.setText(String.valueOf(0));
+                        setBtnBackground(index);
+                        if (mAdapter.getData().size() == 0) {
+                            mLlMycollectionBottomDialog.setVisibility(View.GONE);
+                        }
+                        mAdapter.notifyDataSetChanged();
+
+                        getDate();
+                    }
+                })
+                .show();
+    }
+
+
+    /**
+     * 全选和反选
+     */
+    private void selectAllMain() {
+        if (mAdapter == null) {
+            return;
+        }
+        if (!isSelectAll) {
+            for (int i = 0, j = mAdapter.getData().size(); i < j; i++) {
+                mAdapter.getData().get(i).setSelect(true);
+            }
+            index = mAdapter.getData().size();
+            mBtnDelete.setEnabled(true);
+            mSelectAll.setText("取消全选");
+            isSelectAll = true;
+        } else {
+            for (int i = 0, j = mAdapter.getData().size(); i < j; i++) {
+                mAdapter.getData().get(i).setSelect(false);
+            }
+            index = 0;
+            mBtnDelete.setEnabled(false);
+            mSelectAll.setText("全选");
+            isSelectAll = false;
+        }
+        mAdapter.notifyDataSetChanged();
+        setBtnBackground(index);
+    }
+    /**
+     * 根据选择的数量是否为0来判断按钮的是否可点击.
+     *
+     * @param size
+     */
+    private void setBtnBackground(int size) {
+        if (size != 0) {
+            mBtnDelete.setBackgroundResource(R.drawable.button_shape);
+            mBtnDelete.setEnabled(true);
+            mBtnDelete.setTextColor(Color.WHITE);
+        } else {
+            mBtnDelete.setBackgroundResource(R.drawable.button_noclickable_shape);
+            mBtnDelete.setEnabled(false);
+            mBtnDelete.setTextColor(ContextCompat.getColor(_mActivity, R.color.color_b7b8bd));
+        }
+    }
     @Subscriber(tag = EventBusTags.REFRESH_HIS)
     private void updateUser(Event event) {
         getDate();

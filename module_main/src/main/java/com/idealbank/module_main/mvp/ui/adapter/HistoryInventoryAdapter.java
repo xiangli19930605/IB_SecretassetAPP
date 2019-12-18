@@ -17,6 +17,8 @@ package com.idealbank.module_main.mvp.ui.adapter;
 
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.allen.library.SuperTextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -43,7 +45,8 @@ import me.jessyan.armscomponent.commonsdk.bean.Historyrecord.TaskBean;
 public class HistoryInventoryAdapter extends BaseQuickAdapter<TaskBean, BaseViewHolder> {
     private AppComponent mAppComponent;
     private ImageLoader mImageLoader;//用于加载图片的管理类,默认使用 Glide,使用策略模式,可替换框架
-
+    private static final int MYLIVE_MODE_CHECK = 0;
+    int mEditMode = MYLIVE_MODE_CHECK;
     public HistoryInventoryAdapter(@Nullable List data) {
         super(R.layout.item_rv_historyinventory, data);
     }
@@ -68,9 +71,21 @@ public class HistoryInventoryAdapter extends BaseQuickAdapter<TaskBean, BaseView
         ((SuperTextView) helper.getView(R.id.stv_createTime)).setCenterString(data.getCreateTime());
         ((SuperTextView) helper.getView(R.id.stv_num)).setCenterString("" + data.getNumber());
         ((SuperTextView) helper.getView(R.id.stv_taskid)).setCenterString(data.getTaskid());
-
+        if (mEditMode == MYLIVE_MODE_CHECK) {
+            ((ImageView) helper.getView(R.id.check_box)).setVisibility(View.GONE);
+        } else {
+            ((ImageView) helper.getView(R.id.check_box)).setVisibility(View.VISIBLE);
+            if (data.isSelect()) {
+                ((ImageView) helper.getView(R.id.check_box)).setImageResource(R.mipmap.ic_checked);
+            } else {
+                ((ImageView) helper.getView(R.id.check_box)).setImageResource(R.mipmap.ic_uncheck);
+            }
+        }
         helper.addOnClickListener(R.id.content).addOnClickListener(R.id.right_menu_1);
     }
 
-
+    public void setEditMode(int editMode) {
+        mEditMode = editMode;
+        notifyDataSetChanged();
+    }
 }

@@ -185,6 +185,16 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void setUpdataTime(String time) {
+         mPreferencesHelper .setUpdataTime(time);
+    }
+
+    @Override
+    public String getUpdataTime() {
+        return mPreferencesHelper .getUpdataTime();
+    }
+
+    @Override
     public void setUsbState(boolean b) {
           mPreferencesHelper.setUsbState(b);
     }

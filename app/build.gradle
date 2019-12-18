@@ -4,10 +4,10 @@ apply plugin: 'org.greenrobot.greendao'
 android {
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\79430\\Desktop\\mantoo')
-            storePassword 'mantoo'
-            keyPassword 'mantoo'
-            keyAlias = 'mantoosoftware'
+            storeFile file('C:\\Users\\79430\\Desktop\\ideabank')
+            storePassword 'ideabank'
+            keyPassword 'ideabank'
+            keyAlias = 'ideabank'
         }
     }
     compileSdkVersion rootProject.ext.android["compileSdkVersion"]

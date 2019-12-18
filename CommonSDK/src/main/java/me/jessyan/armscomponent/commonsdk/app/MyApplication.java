@@ -142,8 +142,11 @@ public class MyApplication extends BaseApplication {
 
     //static 代码段可以防止内存泄露
     static {
+        //夜间模式
         AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_AUTO);
+                AppCompatDelegate.MODE_NIGHT_NO
+//                AppCompatDelegate.MODE_NIGHT_AUTO
+        );
         //设置全局的Header构建
         SmartRefreshLayout.setDefaultRefreshHeaderCreator(new DefaultRefreshHeaderCreator() {
             @Override
