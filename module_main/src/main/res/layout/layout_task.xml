@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:stv="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <ImageView
+        android:id="@+id/check_box"
+        android:src="@mipmap/ic_uncheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:gravity="center"
+
+        />
+
+    <RelativeLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/bg_ll_history"
+        android:padding="@dimen/dp_30"
+        android:orientation="horizontal"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.allen.library.SuperTextView
+                style="@style/TextView_commom"
+                android:id="@+id/stv_taskid"
+                stv:sCenterTextString="13312"
+                stv:sLeftTextString="任务ID："
+                />
+            <com.allen.library.SuperTextView
+                android:id="@+id/stv_createTime"
+                style="@style/TextView_commom"
+                stv:sCenterTextString="2019-3-4"
+                stv:sLeftTextString="盘查时间："
+                />
+            <com.allen.library.SuperTextView
+                android:id="@+id/stv_num"
+                style="@style/TextView_commom"
+                stv:sCenterTextString="3"
+                stv:sLeftTextString="物品件数："
+                />
+            <com.allen.library.SuperTextView
+                android:id="@+id/tv_result"
+                style="@style/TextView_commom"
+                stv:sCenterTextString="允许通行"
+                stv:sLeftTextString="盘查结果："
+                />
+
+        </LinearLayout>
+
+
+
+
+
+    </RelativeLayout>
+</LinearLayout>

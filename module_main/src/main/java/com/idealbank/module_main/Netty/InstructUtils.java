@@ -111,7 +111,6 @@ public class InstructUtils {
     public static UpLoadAssetsBean getUpLoadAssetsBean(String taskid, String createTime, String reason, List<AssetsBean> mList) {
             Location location = GsonUtil.GsonToBean(new DbManager().getLocation(), Location.class);
             if (location == null) {
-                LogUtils.e(location.getSpaceName());
                 return null;
             }
             UpLoadAssetsBean upLoadAssetsBean = new UpLoadAssetsBean();

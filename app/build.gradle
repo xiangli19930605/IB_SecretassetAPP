@@ -4,7 +4,7 @@ apply plugin: 'org.greenrobot.greendao'
 android {
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\79430\\Desktop\\ideabank')
+            storeFile file('E:\\IdeaBankProject\\work\\BeiJingSheMiWuPin\\ideabank')
             storePassword 'ideabank'
             keyPassword 'ideabank'
             keyAlias = 'ideabank'

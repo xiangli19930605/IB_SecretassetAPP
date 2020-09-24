@@ -114,5 +114,4 @@
         app:layout_anchorGravity="bottom|right|end"
         android:scaleType="center"
         app:layout_behavior="com.idealbank.module_main.mvp.ui.view.behavior.ScaleDownShowBehavior" />
-
 </android.support.design.widget.CoordinatorLayout>
